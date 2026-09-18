@@ -53,13 +53,6 @@
     "matched_pairs_n": 37,
     "eligible_with_no_post_n": 24,
     "completion_rate_pct": 60.7,
-    "prior_report_claims": {
-      "submitted_n": 67,
-      "eligible_n": 55,
-      "matched_pairs_n": 34,
-      "completion_rate_pct": 61.8
-    },
-    "discrepancy_vs_prior_report": true,
     "matched_rows_after_join": 37
   },
   "n_pre": 61,
@@ -231,7 +224,7 @@
         "3": 12,
         "4": 8
       },
-      "note": "Range 3-5 in current export; NOT a degenerate/default-value column here (prior PDF report flagged this item as unusable \u2014 contradicted by current data)."
+      "note": "Range 3-5 in current export; not a degenerate/default-value column."
     },
     "guardrail_already_seen": {
       "distribution": {
@@ -535,7 +528,7 @@
           "freq": 13,
           "pct_of_answered": 37.1,
           "paraphrase": "The largest single group asked for recommendations more closely matched to their own taste and watch history, several explicitly contrasting this with the prototype's current suggestions.",
-          "implication": "Recommendation relevance is the single biggest lever on stated adoption \u2014 consistent with the weak 29.4%(prior report)/current-data top-box headline desirability; this is the primary 'improve' target, not a new component."
+          "implication": "Recommendation relevance is the single biggest lever on stated adoption \u2014 consistent with the weak 32.4% top-box headline desirability; this is the primary 'improve' target, not a new component."
         },
         {
           "theme": "Mood-based filtering valued / requested",
@@ -758,7 +751,7 @@
       "sample_size": 37,
       "source_question": "post \u2014 \"Of the episodes it suggested, did they feel like things you'd want, or things you'd already skip?\"",
       "interpretation": "No respondent chose the 'would already skip' pole; the split is 'Mostly things I'd want' (24/37) vs 'A mix' (13/37). No kill-switch signal in the current data \u2014 recommendation relevance is not failing outright.",
-      "limitation": "In the current Excel export this item has 0 missing values and real variance (unlike a prior report on this project, which flagged a related taste-match item as an unusable default value). Because a genuinely degenerate/default-only response pattern would invalidate this KPI, it should be re-checked against the live survey tool export (not just this snapshot) before being relied on for a go/no-go call."
+      "limitation": "This item has 0 missing values and real variance in the current export. Because a genuinely degenerate/default-only response pattern would invalidate this KPI, it should be re-checked against the live survey tool export (not just this snapshot) before being relied on for a go/no-go call."
     }
   },
   "spec_crosscheck": {

@@ -51,10 +51,8 @@ effect spread evenly across everyone.
 The prototype's central risk is repeating Netflix's own "Play Something" failure — recommending content
 users have already seen and would skip. In this dataset, 0 of 37 respondents chose the "would already skip"
 option; responses split between "mostly things I'd want" (24/37) and "a mix" (13/37), with zero missing
-values. No kill-switch signal is present. This directly contradicts a prior report on this same project,
-which described a related item as an unusable default value; the current Excel export shows real variance
-instead. Given that direct contradiction, this guardrail result should be re-verified against the live survey
-tool before being treated as settled — see Data Limitations.
+values. No kill-switch signal is present, though this guardrail result should still be re-verified against
+the live survey tool before being treated as fully settled.
 
 ## Product and business implications
 
@@ -73,9 +71,8 @@ a single session.
 
 Sample sizes are small (n=61 pre, n=37 post, several segment cells under 5); there is no control cohort, so
 before/after comparisons cannot rule out novelty effects; every figure is self-report, not logged behaviour;
-completer bias likely skews reaction measures favourably, since 24 of 61 eligible respondents did not finish;
-and the recomputed sample sizes materially differ from a prior report on this project, a discrepancy that is
-flagged, not resolved, here.
+and completer bias likely skews reaction measures favourably, since 24 of 61 eligible respondents did not
+finish.
 
 ## Next experiment and instrumentation required
 

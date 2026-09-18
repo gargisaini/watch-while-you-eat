@@ -53,7 +53,7 @@ themes = {
             {"theme": "Better / more personalised recommendations", "freq": 13,
              "pct_of_answered": round(100*13/post_thing_n, 1),
              "paraphrase": "The largest single group asked for recommendations more closely matched to their own taste and watch history, several explicitly contrasting this with the prototype's current suggestions.",
-             "implication": "Recommendation relevance is the single biggest lever on stated adoption — consistent with the weak 29.4%(prior report)/current-data top-box headline desirability; this is the primary 'improve' target, not a new component."},
+             "implication": "Recommendation relevance is the single biggest lever on stated adoption — consistent with the weak 32.4% top-box headline desirability; this is the primary 'improve' target, not a new component."},
             {"theme": "Mood-based filtering valued / requested", "freq": 7,
              "pct_of_answered": round(100*7/post_thing_n, 1),
              "paraphrase": "A number of respondents pointed to the mood filter as the thing they want more of or that already works for them.",

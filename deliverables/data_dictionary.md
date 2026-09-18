@@ -31,7 +31,7 @@ Source file: `pre and post final.xlsx` (sheets `pre`, `post`). Cleaned outputs: 
 | `session_id` | session_id | string (UUID) | unique per row | — | join key; all 37 trace to an eligible pre respondent |
 | `noticed_row` | Did you notice a row meant to help you quickly pick something to watch? | categorical | Yes, Not sure, No | (awareness) | — |
 | `perceived_speed` / `perceived_speed_num` | Compared to how you normally decide... | categorical + numeric (-1..2) | Much faster, Faster, About the same, Slower | Q1 (C2) | numeric column consistent 1:1 with categorical |
-| `taste_match` | How well did the episodes it showed you match your taste? | numeric (scale, observed 3–5) | mean 4.14, std 0.89 | **not in spec's Q1–Q9 list** | supplementary item; prior PDF report flagged an item like this as a degenerate default — not the case in this export |
+| `taste_match` | How well did the episodes it showed you match your taste? | numeric (scale, observed 3–5) | mean 4.14, std 0.89 | **not in spec's Q1–Q9 list** | supplementary item; real spread, not a degenerate/default-value column |
 | `start_intention` / `start_intention_num` | If that had been a real meal... started watching or given up? | categorical + numeric (0..2) | Started easily, Started eventually, Probably given up | Q2 (C3) | — |
 | `reduced_struggle` / `reduced_struggle_num` | Did it reduce the 'what do I put on' struggle...? | categorical + numeric (0..2) | Yes, clearly; Somewhat; No | Q3 | — |
 | `stay_on_netflix` / `stay_on_netflix_num` | Would this keep you on Netflix instead of switching...? | categorical + numeric (0..2) | Yes, Maybe, No, I'd still switch | Q4 (C4) | spec's single option "No, I'd still switch" appears split into "No" and "I'd still switch" in this export |

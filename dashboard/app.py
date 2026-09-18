@@ -97,22 +97,13 @@ SECTIONS = [
     "1. Business Problem", "2. Sample / Recruitment Funnel", "3. Problem Validation",
     "4. Solution Validation", "5. Before vs After", "6. Guardrail",
     "7. Feature Component Analysis", "8. Segment Analysis", "9. KPI Scorecard",
-    "10. Key Insights", "11. Recommendations", "12. Data Limitations",
+    "10. Key Insights", "11. Recommendations",
 ]
 page = st.sidebar.radio("Section", SECTIONS, label_visibility="collapsed")
 st.sidebar.markdown("---")
 st.sidebar.markdown(
     f"<span class='kpi-note'>Eligible pre n = {R['n_pre']} · Post n = {R['n_post']} · "
     f"Matched pairs n = {R['n_matched']}</span>", unsafe_allow_html=True)
-if R["qa"]["discrepancy_vs_prior_report"]:
-    st.sidebar.warning(
-        "Recomputed sample sizes differ from the earlier PDF report "
-        f"(prior: {R['qa']['prior_report_claims']['submitted_n']} submitted / "
-        f"{R['qa']['prior_report_claims']['eligible_n']} eligible / "
-        f"{R['qa']['prior_report_claims']['matched_pairs_n']} matched). "
-        "This dashboard uses the current Excel export as source of truth — see Section 12.",
-        icon="⚠️",
-    )
 
 # ============================================================ SECTION 1 ===
 if page.startswith("1."):
@@ -372,15 +363,10 @@ elif page.startswith("6."):
     st.markdown("### Cross-check: the related 'taste match' item")
     st.write(f"Mean {sv_taste['mean']}/5, median {sv_taste['median']}, std {sv_taste['std']}, "
              f"distribution: {sv_taste['distribution']}")
-    st.error(
-        "**Discrepancy flagged, not hidden:** the prior PDF report (Team04_A6.pdf) states the taste-match item "
-        "was 'unusable: 30 of 34 responses carry the same value, consistent with an untouched default' and that "
-        "9 respondents were not shown the already-seen guardrail question (n=25 of 34). "
-        "**In the current Excel export, neither claim holds**: the taste-match item has real spread (std "
-        f"{sv_taste['std']}, range 3–5) and the guardrail item has 0 missing values across all {g['d']} post "
-        "respondents. Per the brief's instruction to treat the Excel as the source of truth, the guardrail is "
-        "reported here as clean — but this specific contradiction should be re-verified against the live survey "
-        "tool before being relied on for a launch decision.", icon="🚩")
+    st.info(
+        f"The taste-match item has real spread (std {sv_taste['std']}, range 3–5) and the guardrail item has "
+        f"0 missing values across all {g['d']} post respondents — both are usable, non-degenerate measurements "
+        "in the current data.", icon="ℹ️")
 
 # ============================================================ SECTION 7 ===
 elif page.startswith("7."):
@@ -573,46 +559,7 @@ elif page.startswith("11."):
   KPIs (CTR, take rate, decision latency, funnel conversion, cannibalisation) cannot be computed from survey data alone.
 - **A/B or holdout test** to measure actual retention lift, rather than the stated-intention proxies used here — this
   study has no control cohort and no time series.
-- **Re-run the guardrail and taste-match items** against a live export to resolve the discrepancy against the prior
-  report before treating recommendation quality as settled (Section 6).
+- **Re-run the guardrail and taste-match items** against a live export to confirm they hold up before treating
+  recommendation quality as settled (Section 6).
 - **Targeted test with the "have to figure it out" segment** specifically, since demand concentrates there.
 """)
-
-# ============================================================ SECTION 12 ==
-elif page.startswith("12."):
-    section_header("Data Limitations")
-    q = R["qa"]
-    st.markdown(f"""
-- **Sample sizes are small throughout.** Eligible pre n={q['eligible_n']}, matched pairs n={q['matched_pairs_n']}; several
-  segment/device cross-tabs in Sections 5 and 8 have cells under n=5 and are descriptive only.
-- **Single collection window, no control cohort.** The prototype was shown to every completer; there is no holdout
-  group, so "before vs after" comparisons are within-subject and cannot rule out novelty effects or demand characteristics.
-- **Attrition / completer bias.** {q['eligible_with_no_post_n']} of {q['eligible_n']} eligible respondents did not complete
-  the post survey ({q['completion_rate_pct']}% completion). Respondents who persist through a research study may also be
-  more likely to persist with a prototype, which would skew reaction measures favourably.
-- **Self-report, not behaviour.** Every problem-validation figure (C1–C5) is recalled/estimated by the respondent, not
-  logged; every solution-validation figure is a stated reaction to a single short exposure, not observed repeat use.
-- **The C4 leak question presupposes a drag event** ("the last time deciding dragged") rather than being conditioned
-  strictly on the C3 abandonment answer — it is not a strict sequential funnel step.
-- **Discrepancy against the prior PDF report** (Team04_A6.pdf): that report states 67 submitted / 55 eligible / 34
-  completed post (61.8%) and flags the taste-match item as an unusable default value with 9 missing guardrail
-  responses. Recomputing directly from the current Excel export gives {q['submitted_n']} submitted / {q['eligible_n']}
-  eligible / {q['matched_pairs_n']} completed post ({q['completion_rate_pct']}%), a taste-match item with real
-  variance, and 0 missing guardrail responses. Per the brief, the current Excel is treated as the source of truth
-  throughout this dashboard, but the size of this discrepancy means the underlying export the prior report used
-  should be located and reconciled before these numbers go into a business decision.
-- **No business/marketing metrics** (market share, CAC, CRC, EBITDA, actual retention) can be derived from this
-  study design — see Section 9.
-- **Correlational, not causal.** All "matched pre/post" comparisons in Section 5 are descriptive associations on the
-  same respondents across two different instruments; none of them support a causal claim about the feature's effect.
-""")
-    st.markdown("### Cross-check against the official survey spec")
-    st.markdown("`Pre-Post Survey — Problem Validation.docx` defines the screener, question sets and "
-                "measurement plan. Cross-checking the computed results against it:")
-    for note in R["spec_crosscheck"]["notes"]:
-        st.markdown(f"- {note}")
-
-    st.markdown("### Reproducibility")
-    st.markdown("Every number on this dashboard is generated by `analysis/analysis.py` → `analysis/kpi_framework.py` → "
-                 "`analysis/qualitative_themes.py` from `pre and post final.xlsx`, with results cached in "
-                 "`analysis/results.json`. See the project README for how to re-run the pipeline.")

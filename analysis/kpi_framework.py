@@ -122,8 +122,7 @@ guardrail = {
                           r["guardrail"]["distribution"].get("A mix", 0),
                           r["guardrail"]["valid_responses_n"],
                       ),
-    "limitation": "In the current Excel export this item has 0 missing values and real variance (unlike a prior report on this "
-                  "project, which flagged a related taste-match item as an unusable default value). Because a genuinely "
+    "limitation": "This item has 0 missing values and real variance in the current export. Because a genuinely "
                   "degenerate/default-only response pattern would invalidate this KPI, it should be re-checked against the "
                   "live survey tool export (not just this snapshot) before being relied on for a go/no-go call.",
 }

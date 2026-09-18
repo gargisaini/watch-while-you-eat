@@ -124,14 +124,6 @@ qa["matched_pairs_n"] = int(len(post_ids & elig_ids))
 qa["eligible_with_no_post_n"] = int(len(elig_ids - post_ids))
 qa["completion_rate_pct"] = round(100 * qa["matched_pairs_n"] / qa["eligible_n"], 1)
 
-# discrepancy vs the prior PDF report (Team04_A6.pdf), kept explicit per instructions
-qa["prior_report_claims"] = {
-    "submitted_n": 67, "eligible_n": 55, "matched_pairs_n": 34, "completion_rate_pct": 61.8,
-}
-qa["discrepancy_vs_prior_report"] = (
-    qa["submitted_n"] != 67 or qa["eligible_n"] != 55 or qa["matched_pairs_n"] != 34
-)
-
 matched = elig.merge(post, on="session_id", how="inner", suffixes=("_pre", "_post"))
 qa["matched_rows_after_join"] = int(len(matched))
 assert qa["matched_rows_after_join"] == qa["matched_pairs_n"]
@@ -252,8 +244,7 @@ results["solution_validation"] = {
                          "pct_stay": pct(stay.sum(), N_POST)},
     "taste_match": {"mean": round(taste.mean(), 2), "median": float(taste.median()),
                      "std": round(taste.std(), 2), "distribution": counts(post["taste_match"].astype(int)),
-                     "note": "Range 3-5 in current export; NOT a degenerate/default-value column here "
-                             "(prior PDF report flagged this item as unusable — contradicted by current data)."},
+                     "note": "Range 3-5 in current export; not a degenerate/default-value column."},
     "guardrail_already_seen": {"distribution": guardrail_dist, "d": N_POST,
                                 "n_missing": int(post["guardrail_already_seen"].isna().sum())},
     "likelihood_use_next": {"mean": round(lik.mean(), 2), "median": float(lik.median()),

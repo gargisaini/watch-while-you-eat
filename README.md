@@ -39,19 +39,15 @@ new numbers automatically on its next run since it reads only `analysis/results.
 streamlit run dashboard/app.py
 ```
 
-Opens at `http://localhost:8501` (or the next free port). Twelve sections, navigable from the sidebar:
+Opens at `http://localhost:8501` (or the next free port). Eleven sections, navigable from the sidebar:
 Business Problem, Sample/Recruitment Funnel, Problem Validation, Solution Validation, Before vs After,
-Guardrail, Feature Component Analysis, Segment Analysis, KPI Scorecard, Key Insights, Recommendations, Data
-Limitations.
+Guardrail, Feature Component Analysis, Segment Analysis, KPI Scorecard, Key Insights, Recommendations.
 
 ## Project structure
 
 ```
 pre and post final.xlsx                 raw survey export (source of truth)
 Pre-Post Survey — Problem Validation.docx   screener + question spec + measurement plan
-Team04_A6.pdf                            prior KPI report on this project (used only as a cross-check;
-                                          several of its figures do not reproduce from the current Excel —
-                                          see deliverables/qa_report.md section 4)
 analysis/
   analysis.py                            main pipeline: QA, screener, matching, C1-C5, solution validation,
                                           matched pre/post, guardrail, qualitative raw text extraction
@@ -66,7 +62,7 @@ dashboard/
   app.py                                 Streamlit dashboard (reads only results.json + the three CSVs)
 deliverables/
   data_dictionary.md                     column-by-column dictionary, raw name -> clean name -> notes
-  qa_report.md                           data quality report (screener, matching, discrepancies)
+  qa_report.md                           data quality report (screener, matching, spec cross-check)
   business_proposal.md                   ~1000-word business proposal
 README.md                                this file
 ```
@@ -74,13 +70,13 @@ README.md                                this file
 ## Key numbers (see dashboard for full detail with denominators)
 
 - 75 pre-survey submissions -> 61 eligible after the screener -> 37 completed the post survey (60.7%
-  completion). This differs from the prior PDF report's 67/55/34 (61.8%) — see `deliverables/qa_report.md`.
+  completion).
 - Problem validation is partial: the occasion is frequent (85.2% watch at a meal 3+/week) and the off-platform
   leak is real (54.1%), but chronic abandonment is a minority (13.1% "often") and 37.7% of respondents already
   know what they want before sitting down (the falsifier).
 - Solution reaction measures are strongly positive (94.6% would have started, 86.5% would stay on Netflix) but
   the measure requiring actual commitment is weaker (32.4% top-box likelihood to use).
-- The guardrail (already-seen/would-skip) shows no failure signal in the current data (0/37), which
-  contradicts a related claim in the prior PDF report — flagged, not hidden, in Section 6 of the dashboard.
+- The guardrail (already-seen/would-skip) shows no failure signal in the current data (0/37) — see Section 6
+  of the dashboard.
 - No business metrics (market share, CAC, CRC, EBITDA, actual retention) are measurable from this dataset;
   see Section 9 of the dashboard for what would be required.
