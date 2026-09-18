@@ -1,0 +1,101 @@
+Pre-Visit Survey — Problem Validation
+Pre-Visit Survey — Problem Validation
+Run this before the participant opens the prototype. Its job is to test whether the problem in our statement is real for this person — not to warm them up. Every question maps to a claim in the problem statement (tags C1–C5), and two questions can disprove the problem if it isn't there.
+Claims under test:
+C1 Occasion — mealtime watching is a real, recurring thing for 18–30s.
+C2 Friction — deciding what to watch at a meal takes long / is hard.
+C3 Abandonment — the friction is bad enough that they give up before starting.
+C4 Leak — giving up sends them off-platform (the retention mechanism).
+C5 Magnitude — it happens often enough to matter.
+Question types: [Single] one choice · [Multi] select all · [Slider] a scale · [Open] free text.
+Screener
+S1. How old are you? [Single] — Under 18 (screen out) · 18–22 · 23–26 · 27–30 · 31+ (out of segment)
+S2. How often do you stream shows or movies? [Single] — Every day · A few times a week · About once a week · Rarely (screen out)
+S3. Do you watch while eating a meal? [Single] — Most meals · Sometimes · Rarely · Never (screen out)
+Problem questions
+Q1 · C1 Occasion. In a typical week, how many times do you watch something on a streaming app while eating a meal? [Single] — 0 (out of segment) · 1–2 · 3–5 · 6–10 · 10+
+Q2 · C2 Friction (recalled). Think about the last time you watched during a meal. How long did you spend deciding before you actually started? [Single] — Under 1 min · 1–3 · 3–5 · 5–10 · Over 10 · I never started
+Q3 · C2 Cost of the window. By the time you settled on something, how much of your meal was already over? [Slider] — None of it → Most of it
+Q4 · C3 Abandonment (core claim). In the last month, how often did you open a streaming app at a meal but give up without watching anything on it? [Single] — Never · Once or twice · A few times · Often · Almost every time
+Q5 · C3 Falsifier — the most important question here. When you sit down to watch at a meal, do you usually already know what you want, or do you have to figure it out? [Single] — I usually already know · I usually have to figure it out · Depends
+If "already know" dominates the sample, the problem statement is overstated — this is exactly the intent that killed Netflix's Play Something. The survey must be able to return this answer.
+Q6 · C4 Leak. The last time deciding dragged at a meal, what did you actually do? [Single] — Watched something on it anyway · Put on an old favourite · Switched to YouTube · Switched to another app · Scrolled social media · Gave up and just ate
+The non-platform answers are the retention leak — how we evidence C4 without asking users about "retention," which they can't see.
+Q7 · C5 Severity. How annoying is the "what do I put on" part at mealtime, for you? [Slider 0–10] — Not at all → Extremely
+Q8 · Open. Describe the last time you gave up trying to find something at a meal — what happened? [Open, optional]
+Claim → question map
+C1 Occasion: Q1
+C2 Friction / cost: Q2, Q3
+C3 Abandonment: Q4, and the falsifier Q5
+C4 Off-platform leak: Q6
+C5 Magnitude / severity: Q1 (frequency) × Q7 (severity)
+The problem is validated if the segment reports the occasion is frequent (Q1), deciding takes real time (Q2/Q3), a meaningful share give up (Q4) and go off-platform (Q6), and severity is high (Q7) — and the falsifier (Q5) does not come back mostly "already know." Any of those failing is a real result, reported as-is.
+Post-Visit Survey — Solution Validation
+Run this immediately after the participant uses the prototype. Its job is to test whether the feature moves the same pain the pre-survey measured — not whether they liked it. The questions re-measure the pre-survey's pain dimensions so you can report a before/after delta.
+Claims (same as the pre-survey): C2 Friction · C3 Abandonment · C4 Leak, plus a guardrail against the Play Something failure.
+Question types: [Single] one choice · [Multi] select all · [Slider] a scale · [Open] free text.
+Q1 · vs. C2 Friction. Compared to how you normally decide at a meal, finding something with the "Watch While You Eat" row was — [Single] Much faster · Faster · About the same · Slower
+Q2 · vs. C3 Abandonment. If that had been a real meal just now, would you have started watching — or given up? [Single] — Started easily · Started eventually · Probably given up
+Q3 · Did it hit the actual problem. Did it reduce the "what do I put on" struggle for you specifically? [Single] — Yes, clearly · Somewhat · No
+Q4 · vs. C4 Leak. Would this keep you on Netflix at a meal instead of switching to something else? [Single] — Yes · Maybe · No, I'd still switch
+Q5 · Guardrail. Did the suggestions feel like things you'd want, or things you'd already skip? [Single] — Mostly want · A mix · Mostly already-seen / would-skip
+A high "already-seen" share is the Play Something failure — a red flag even if clicks look fine.
+Q6 · Which mechanic carried it. Which parts felt useful? [Multi] — Best-episode pick per show · Mood filters · Jump-to-best-moment graph · That it used shows I already watch · None
+Q7 · Magnitude of relief. How much would this improve your mealtime watching? [Slider 0–10] — Not at all → A lot
+Q8 · Open. What is the ONE thing that would make you actually use it? [Open]
+Q9 · Open. Anything that confused you or got in the way? [Open, optional]
+How pre and post join
+Decision time: pre Q2 vs. post Q1 → "self-reported decision time fell from X to faster."
+Abandonment: pre Q4 vs. post Q2 → "of those who often give up, N% said they'd have started with the feature."
+Leak: pre Q6 vs. post Q4 → did the switch-away intent reverse.
+Guardrail (post Q5) is the single kill-switch signal to watch.
+The feature is validated only if it moves these dimensions for the people the pre-survey showed had the problem — not for the room in general. Where a participant's answers and their actual clicks disagree, the clicks win.
+Tab 2
+Measurement Plan — Objectives, Metrics & KPIs
+What the study is actually trying to answer, the formulas that decide whether the fake door is viable, and the wider KPI set — including the ones worth borrowing from the formulae sheet and the ones that don't apply. Throughout: behaviour is the verdict, the survey explains it, and retention is a north-star the feature targets, inferred from the off-platform leak, never measured in a single session.
+1. Objective questions (the real research objectives)
+Six objectives. O1–O5 test whether the problem is real; O6 tests whether the feature moves it. Each notes whether it is answered by behaviour, survey, or both.
+O1 — Decision latency. How long does a viewer take to select a title at a meal, and how does that compare with the 60–90-second point at which attention is known to lapse? (behaviour: time-to-first-play; survey: pre_q2)
+O2 — Abandonment. At what point — elapsed time or titles browsed — do viewers give up and leave, and how often does that happen? (behaviour: give-up rate, tiles opened before start; survey: pre_q4)
+O3 — Drivers of friction. Why is the choice hard: too many options, nothing appealing, already-seen the good stuff, mood mismatch, commitment aversion? (survey: pre_q6, pre_q8; observed hesitation in moderated sessions)
+O4 — Device dependence. Does decision difficulty and give-up behaviour differ by device — mobile vs laptop vs TV? (behaviour segmented by device; survey: pre_s3 device use)
+O5 — Off-platform leak. When viewers give up, where do they go, and how much of the mealtime occasion is lost off-platform? This is the bridge to the retention claim. (survey: pre_q6, post_q6)
+O6 — Does the intervention help. Does pre-picking a best, already-enjoyed episode measurably cut decision time and abandonment versus normal browsing — without re-serving titles the viewer would already skip? (behaviour: feature vs baseline funnel, dwell; survey: post_q2, post_q4, post_q7 guardrail)
+2. Viability decision rule (the primary formulas)
+These three, pre-registered before collection, decide validated vs. not. All are computed from the event log (row_impression, row_click with isFeature / path, feature_dwell).
+Relative CTR uplift — the centrepiece.
+Feature CTR   = feature-row clicks      ÷ feature-row impressions
+Baseline CTR  = generic-row clicks      ÷ generic-row impressions   (averaged across generic rows)
+Relative uplift = Feature CTR ÷ Baseline CTR
+Within-session, so each participant's feature behaviour is compared against their own generic-row behaviour, which cancels out how clicky each person is. Viable threshold: uplift ≥ 1.5×. Worked example (illustrative): feature CTR 24%, baseline 12% → uplift 2.0× → clears the bar.
+Feature adoption.
+Feature adoption = sessions with ≥1 feature row_click ÷ qualified sessions
+Threshold ≥ 30%. ("Qualified" = passed the screener and reached the prototype.)
+Engagement depth.
+Median feature dwell = median( feature_dwell.ms ÷ 1000 ) over sessions that clicked the feature
+Threshold ≥ 20 seconds.
+Verdict: validated if all three hold; weak / inconclusive if uplift clears but dwell is low (curiosity, not utility); not validated if uplift ≤ 1 or give-up dominates. These three thresholds (1.5×, 30%, 20s) are the code defaults and must be locked with the team before recruiting.
+3. Supporting behavioural KPIs
+Funnel conversion (per path). For each stage, conversion = count at stage(n+1) ÷ count at stage(n) across impression → row_click → title_open → play → scrubber. Read WWYE vs browse side by side; the biggest drop-off is where the feature (or the catalogue) loses people.
+Take rate (Netflix's own metric). plays from the feature ÷ feature impressions — did showing the row produce a real, committed play, not just a curious click. This is the quality check on CTR.
+Give-up / abandonment rate. sessions that viewed home but never played ÷ qualified sessions, per path. The behavioural form of O2.
+Decision latency. median( first play_click ts − home_view ts ), per path — the behavioural answer to O1, comparable to the pre-survey's stated decide-time and to the 60–90-second benchmark.
+Best-moment usage. sessions that used the scrubber ÷ sessions exposed to it (using the exposure flags). Tells you whether the signature mechanic earns its place.
+4. Attitudinal KPIs (from the survey)
+Likelihood-to-use (top-box). % of respondents rating post_q9 ≥ 8 on 0–10 — the headline desirability number, reported as a top-box share, not a mean (means hide bimodal love/indifference). Supports the behavioural verdict; never overrides it.
+Perceived speed-up. % answering post_q2 "faster" or "much faster".
+Guardrail — already-seen share. % answering post_q7 "mostly already-seen / would skip". This is the kill-switch signal: a high share is the Play Something failure, a red flag even when clicks look fine. Keep it low.
+Stated-vs-revealed gap. Per participant, compare stated decide-time (pre_q2) against measured latency, and stated give-up (pre_q4) against behavioural give-up. Where they disagree, the behaviour stands and the gap itself is a finding.
+5. KPIs from the formulae sheet — what applies, what's modelled, what doesn't
+Retention Rate — (customers at end − new customers) ÷ customers at start × 100. This is the north-star the feature ultimately targets and the metric your problem statement invokes. It cannot be measured in a one-session fake door (it needs a cohort tracked over time). Use it correctly: name it as the business goal, then present the leading indicators you did measure — give-up rate and the off-platform leak — as its predictors. Do not report a retention number as if observed.
+Customer Lifetime Value — Margin × [ RR ÷ (1 + Discount − RR) ]. Use it for a business-case sensitivity, clearly labelled as a model, not a measurement: show how a small retention lift (implied by a lower give-up rate) moves CLV. One line of "if the feature trims mealtime give-up by X points, and that lifts retention by Y, CLV rises by Z" turns a UX result into a business argument — which is what a dossier reviewer wants, as long as it's flagged illustrative.
+Cannibalization Rate — sales lost from existing products ÷ sales of new product, adapted to engagement redirected from other rows ÷ engagement on the feature row. The real question it raises is sharp: is the WWYE row creating new engagement or just redistributing clicks that would have gone to other rows anyway? Honest limitation: your within-session design (everyone sees the feature) has no counterfactual, so cannibalization can't be cleanly measured without a no-feature control cohort. If it matters to the grade, that's the one reason to run a small no-feature arm; otherwise, approximate by watching whether total plays per session rise, not just feature plays.
+Average Retention Cost vs Average Acquisition Cost — contextual, not computed: retaining a viewer is far cheaper than acquiring one, so a feature that trims give-up-driven churn has leverage out of proportion to its size. A single framing line in the business section, no data needed.
+YoY Growth / CAGR — not applicable. They need a time series the study doesn't produce. Leave them out rather than force them.
+6. Objective → metric crosswalk
+O1 latency → decision latency (behaviour) + pre_q2 (stated) + 60–90s benchmark
+O2 abandonment → give-up rate, tiles-before-start + pre_q4
+O3 friction drivers → pre_q6, pre_q8, moderated observation
+O4 device → all behavioural KPIs segmented by device + pre_s3
+O5 leak → pre_q6, post_q6 → feeds the retention north-star
+O6 intervention → relative uplift, adoption, dwell, take rate, post_q2/q4/q7

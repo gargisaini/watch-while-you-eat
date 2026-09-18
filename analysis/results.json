@@ -1,0 +1,788 @@
+{
+  "qa": {
+    "pre_rows_total": 75,
+    "pre_duplicate_session_ids": 0,
+    "post_rows_total": 37,
+    "post_duplicate_session_ids": 0,
+    "pre_missing_by_col": {
+      "session_id": 0,
+      "screened_out": 0,
+      "age_band": 0,
+      "stream_freq": 0,
+      "eat_while_watch": 0,
+      "devices": 0,
+      "meal_sessions_per_week": 0,
+      "decision_time": 0,
+      "meal_pct_over": 0,
+      "giveup_freq": 0,
+      "know_what_want": 0,
+      "action_when_dragged": 0,
+      "annoyance": 0,
+      "open_giveup_story": 52
+    },
+    "post_missing_by_col": {
+      "session_id": 0,
+      "noticed_row": 0,
+      "perceived_speed": 0,
+      "taste_match": 0,
+      "start_intention": 0,
+      "reduced_struggle": 0,
+      "stay_on_netflix": 0,
+      "guardrail_already_seen": 0,
+      "useful_components": 0,
+      "likelihood_use_next": 0,
+      "open_one_thing": 0,
+      "open_confusion": 29,
+      "perceived_speed_num": 0,
+      "start_intention_num": 0,
+      "reduced_struggle_num": 0,
+      "stay_on_netflix_num": 0
+    },
+    "screener_flag_matches_recomputation": true,
+    "screener_breakdown": {
+      "age_out_of_range": 7,
+      "streaming_freq_too_low": 8,
+      "never_eats_while_watching": 1,
+      "zero_meal_sessions_per_week": 4
+    },
+    "submitted_n": 75,
+    "eligible_n": 61,
+    "screened_out_n": 14,
+    "post_ids_not_in_pre": [],
+    "post_ids_from_screened_out_pre": [],
+    "matched_pairs_n": 37,
+    "eligible_with_no_post_n": 24,
+    "completion_rate_pct": 60.7,
+    "prior_report_claims": {
+      "submitted_n": 67,
+      "eligible_n": 55,
+      "matched_pairs_n": 34,
+      "completion_rate_pct": 61.8
+    },
+    "discrepancy_vs_prior_report": true,
+    "matched_rows_after_join": 37
+  },
+  "n_pre": 61,
+  "n_post": 37,
+  "n_matched": 37,
+  "C1_occasion": {
+    "distribution": {
+      "6\u201310": 22,
+      "3\u20135": 16,
+      "10+": 14,
+      "1\u20132": 9
+    },
+    "n_3_or_more_per_week": 52,
+    "d": 61,
+    "pct_3_or_more_per_week": 85.2,
+    "device_counts": {
+      "Laptop": 31,
+      "TV": 19,
+      "Phone": 35,
+      "Tablet": 11
+    }
+  },
+  "C2_friction": {
+    "decision_time_distribution": {
+      "3\u20135 minutes": 16,
+      "1\u20133 minutes": 15,
+      "Over 10 minutes": 11,
+      "Under 1 minute": 9,
+      "5\u201310 minutes": 9,
+      "I never started": 1
+    },
+    "n_over_3min": 36,
+    "d_time": 61,
+    "pct_over_3min": 59.0,
+    "n_over_5min": 20,
+    "pct_over_5min": 32.8,
+    "n_over_10min": 11,
+    "pct_over_10min": 18.0,
+    "meal_pct_over_mean": 3.23,
+    "meal_pct_over_median": 3.0
+  },
+  "C3_abandonment": {
+    "giveup_freq_distribution": {
+      "Once or twice": 22,
+      "A few times": 18,
+      "Never": 13,
+      "Often": 8
+    },
+    "n_gave_up_at_least_once": 48,
+    "d": 61,
+    "pct_gave_up_at_least_once": 78.7,
+    "n_chronic_often": 8,
+    "pct_chronic_often": 13.1,
+    "falsifier_distribution": {
+      "I usually already know": 23,
+      "I usually have to figure it out": 20,
+      "Depends": 18
+    },
+    "n_already_know": 23,
+    "pct_already_know": 37.7
+  },
+  "C4_leak": {
+    "action_distribution": {
+      "Switched to YouTube": 23,
+      "Put on an old favourite": 21,
+      "Scrolled social media instead": 9,
+      "Watched something on it anyway": 7,
+      "Switched to another app": 1
+    },
+    "n_off_platform": 33,
+    "d": 61,
+    "pct_off_platform": 54.1,
+    "n_youtube": 23,
+    "off_platform_labels": [
+      "Switched to YouTube",
+      "Scrolled social media instead",
+      "Switched to another app"
+    ],
+    "on_platform_labels": [
+      "Put on an old favourite",
+      "Watched something on it anyway"
+    ],
+    "note": "Asked to all eligible respondents, framed as 'the last time deciding dragged' \u2014 presupposes a drag event rather than being gated on C3 abandonment."
+  },
+  "C5_severity": {
+    "mean": 5.7,
+    "median": 6.0,
+    "std": 3.09,
+    "distribution": {
+      "8": 10,
+      "10": 9,
+      "7": 8,
+      "6": 8,
+      "5": 6,
+      "0": 5,
+      "1": 5,
+      "3": 4,
+      "4": 4,
+      "2": 1,
+      "9": 1
+    },
+    "n_top_box_7plus": 28,
+    "d": 61,
+    "pct_top_box_7plus": 45.9
+  },
+  "solution_validation": {
+    "noticed_row": {
+      "n": 30,
+      "d": 37,
+      "pct": 81.1,
+      "distribution": {
+        "Yes": 30,
+        "Not sure": 5,
+        "No": 2
+      }
+    },
+    "perceived_speed": {
+      "distribution": {
+        "Faster": 15,
+        "About the same": 14,
+        "Much faster": 7,
+        "Slower": 1
+      },
+      "n_faster": 22,
+      "d": 37,
+      "pct_faster": 59.5
+    },
+    "start_intention": {
+      "distribution": {
+        "Started eventually": 18,
+        "Started easily": 17,
+        "Probably given up": 2
+      },
+      "n_would_start": 35,
+      "d": 37,
+      "pct_would_start": 94.6,
+      "n_started_easily": 17,
+      "pct_started_easily": 45.9
+    },
+    "reduced_struggle": {
+      "distribution": {
+        "Somewhat": 27,
+        "Yes, clearly": 8,
+        "No": 2
+      },
+      "n_reduced": 35,
+      "d": 37,
+      "pct_reduced": 94.6,
+      "n_reduced_clearly": 8,
+      "pct_reduced_clearly": 21.6
+    },
+    "stay_on_netflix": {
+      "distribution": {
+        "Maybe": 20,
+        "Yes": 12,
+        "No": 4,
+        "I'd still switch": 1
+      },
+      "n_stay": 32,
+      "d": 37,
+      "pct_stay": 86.5
+    },
+    "taste_match": {
+      "mean": 4.14,
+      "median": 4.0,
+      "std": 0.89,
+      "distribution": {
+        "5": 17,
+        "3": 12,
+        "4": 8
+      },
+      "note": "Range 3-5 in current export; NOT a degenerate/default-value column here (prior PDF report flagged this item as unusable \u2014 contradicted by current data)."
+    },
+    "guardrail_already_seen": {
+      "distribution": {
+        "Mostly things I'd want": 24,
+        "A mix": 13
+      },
+      "d": 37,
+      "n_missing": 0
+    },
+    "likelihood_use_next": {
+      "mean": 6.14,
+      "median": 6.0,
+      "distribution": {
+        "6": 7,
+        "8": 6,
+        "7": 5,
+        "10": 4,
+        "5": 4,
+        "4": 3,
+        "3": 3,
+        "9": 2,
+        "0": 1,
+        "1": 1,
+        "2": 1
+      },
+      "n_top_box_8plus": 12,
+      "d": 37,
+      "pct_top_box_8plus": 32.4
+    },
+    "useful_components": {
+      "counts": {
+        "The mood filters": 19,
+        "The jump-to-the-best-moment graph": 3,
+        "That it used shows I already watch": 11,
+        "The single best-episode pick per show": 19
+      },
+      "d": 37,
+      "pct": {
+        "The mood filters": 51.4,
+        "The jump-to-the-best-moment graph": 8.1,
+        "That it used shows I already watch": 29.7,
+        "The single best-episode pick per show": 51.4
+      }
+    }
+  },
+  "guardrail": {
+    "valid_responses_n": 37,
+    "missing_n": 0,
+    "d": 37,
+    "distribution": {
+      "Mostly things I'd want": 24,
+      "A mix": 13
+    },
+    "already_skip_option_present_in_data": false
+  },
+  "matched_1_friction_vs_speed": {
+    "n": 37,
+    "transition_matrix": {
+      "false": {
+        "false": 8,
+        "true": 9
+      },
+      "true": {
+        "false": 7,
+        "true": 13
+      }
+    },
+    "note": "Pre 'spent >3 min deciding' (rows) vs post 'perceived row as faster/much faster' (cols). Proxy comparison: different measurement instruments (behavioural recall vs stated perception) on the same respondents, not a repeated identical metric."
+  },
+  "matched_2_abandonment_vs_start": {
+    "n": 37,
+    "chronic_abandoners_transition": {
+      "false": {
+        "false": 2,
+        "true": 31
+      },
+      "true": {
+        "false": 0,
+        "true": 4
+      }
+    },
+    "chronic_abandoners_n": 4,
+    "any_abandoners_transition": {
+      "false": {
+        "false": 0,
+        "true": 9
+      },
+      "true": {
+        "false": 2,
+        "true": 26
+      }
+    },
+    "any_abandoners_n": 28
+  },
+  "matched_3_leak_vs_retention": {
+    "n": 37,
+    "transition_matrix": {
+      "false": {
+        "false": 3,
+        "true": 15
+      },
+      "true": {
+        "false": 2,
+        "true": 17
+      }
+    },
+    "off_platform_pre_n": 19,
+    "off_platform_pre_would_stay_n": 17,
+    "off_platform_pre_would_stay_pct": 89.5
+  },
+  "matched_4_problem_status_vs_likelihood": {
+    "n": 37,
+    "by_segment": [
+      {
+        "know_what_want": "Depends",
+        "mean": 5.42,
+        "median": 5.5,
+        "count": 12
+      },
+      {
+        "know_what_want": "I usually already know",
+        "mean": 6.12,
+        "median": 7.0,
+        "count": 16
+      },
+      {
+        "know_what_want": "I usually have to figure it out",
+        "mean": 7.11,
+        "median": 7.0,
+        "count": 9
+      }
+    ]
+  },
+  "matched_4b_annoyance_vs_likelihood_corr": 0.375,
+  "matched_5_device_level": {
+    "by_primary_device": [
+      {
+        "primary_device": "Laptop",
+        "mean": 7.0,
+        "count": 11
+      },
+      {
+        "primary_device": "Phone",
+        "mean": 5.61,
+        "count": 18
+      },
+      {
+        "primary_device": "TV",
+        "mean": 5.2,
+        "count": 5
+      },
+      {
+        "primary_device": "Tablet",
+        "mean": 7.67,
+        "count": 3
+      }
+    ],
+    "note": "Descriptive only; several cells n<5, not tested for significance."
+  },
+  "reversal_C3": {
+    "definition": "Among matched respondents who reported giving up 'Often' pre-survey, share who said they would have started (easily/eventually) post-prototype.",
+    "n_denominator": 4,
+    "n_would_start": 4
+  },
+  "reversal_C4": {
+    "definition": "Among matched respondents who reported an off-platform leak pre-survey, share who said they'd stay on Netflix (yes/maybe) post-prototype.",
+    "n_denominator": 19,
+    "n_would_stay": 17,
+    "pct_would_stay": 89.5
+  },
+  "qualitative_raw_counts": {
+    "pre_giveup_story_answered": 18,
+    "pre_d": 61,
+    "post_one_thing_answered": 35,
+    "post_d": 37,
+    "post_confusion_answered": 4,
+    "post_confusion_blank_or_none": 33
+  },
+  "qualitative_texts": {
+    "pre_giveup_story": [
+      "I just close it or just rewatch something that I like",
+      "I ate the meel with instagram reels",
+      "Never, I always decide well before the meal time what I'm going to watch today. Availability of material i check beforehand because I don't want hassle at mealtime. Available Material is just as important as available food.",
+      "I opened YouTube and watched a video from one the channels I've subscribed.",
+      "The meal was already over. I'm usually in a hurry to finish due to the schedule so as soon as the food's gone I'm up.",
+      "Nothing much i usually gravitate towards classic if it\u2019s consuming a lot of time then i stream a YT vid",
+      "it wasntt even on streaming so i switched to youtube",
+      "Today only while deciding, the food got cold and started something randomly, got to know as soon as we started, it's in Marathi, continued watching it because had to watch something.",
+      "Stitched to YouTube or Instagram",
+      "It\u2019s really frustrating enough but sometimes the food is too good to let go cold!",
+      "I came across a few random food blogs and ended up spending some time exploring them, but couldn\u2019t find exactly what I was looking for.",
+      "When having a meal with parents. Hard to find a show that us genz can watch with parents.",
+      "Made cup of noodles wanted to watch anime. The food got cold and I ended up rewatching same anime",
+      "I opened my you tube and started watvhing TMKOC",
+      "I switched to youtube and watched a video. Mostly I take 10-15 mins to complete my meal",
+      "Nothing\u2026then next time I have started deciding earlier.",
+      "Usually one weekends i have episode releases of anime, during the weekdays i prefer watching something short (if theres no time i just open youtube)",
+      "when i wasn't watching any series in continuation, if i finish any series, next day i will be thinking what to watch"
+    ],
+    "post_one_thing": [
+      "Better recommendations",
+      "Short form content from the same show i watch those on yt shorts a lot like",
+      "No adds while watching",
+      "a random episode generated from a previously watched show",
+      "I dont know",
+      "Good recommendations",
+      "Can't say, different method of preparation for me. I can watch anything on any platform. I decide it well beforehand",
+      "it should adapt to my moods, and should finish with my meal",
+      "Good recommendations based on my previous watching information.",
+      "My own personal to watch list is usually what I stick to. So if they're what's been listed that will make me pick.",
+      "Not something precise, to me I'd just continue watching what I had paused, and if I have nothing pending, I'll just go for top airing show/movie",
+      "Randomly clicking on the recommended shows and start binging helps me",
+      "not really sure, but if the algorithm recommends shows/movies that actually belong to that particular genre. i see a lot of trashy movies getting clubbed with cult classics. popularity isnt a good metric for a good film, craftsmanship is. there needs to be a filter where you can get a ranked list of films based on imdb or letterboxd ratings, maybe even a \"sort by decade\" filter would work. netflix usually pushes their own movies/shows more",
+      "To organise my content more smoothly",
+      "Mostly of the company cover of shows are not known to me. So it was a hastle to click on each frame and see the name. So if the name is mentioned with cover frame, that will be more user friendly to decide",
+      "Idk, show new shows for someone who doesn't rewatch",
+      "the mood picker part",
+      "It picked the best episodes already and the fact that I don\u2019t need to change the streaming platforms",
+      "I don't always want things I've already watched, so if one in every few recommendations were from adjacent shows it might have a higher chance to keep me reeled into that feature.",
+      "Something that\u2019s more closely aligned with the kind of content I usually watch and enjoy.",
+      "the mood filters parts",
+      "The ease of just starting an episode Ik I\u2019d like",
+      "Idk, is it free?",
+      "Change with meal type depending on time of the day",
+      "Easy and relatable recommendations",
+      "Because i dont have to think much.",
+      "Recommendations",
+      "Mood picker",
+      "Filter thing",
+      "Instagram",
+      "Peak",
+      "It matching my taste and mood",
+      "Preferences by my watch history ofc, but i want it to suggest cool scenes from the shows i never watched too like yt shorts",
+      "Mood filters",
+      "A section that shows content with approximately 20-30 minutes episode length shows because post that I\u2019ll again give into not watching it if it\u2019s too long"
+    ],
+    "post_confusion": [
+      "It felt very similar to Netflix so a bit confusing",
+      "No UI to go back to the prototype when I went to the second half of the survey. No visual cues to tell me what I'm supposed to be testing at the prototype. A little popup telling me what I'm about to experience would've been nice",
+      "Having a dedicated \u2018Watch While You Eat\u2019 section might help me feel less anxious and make the meal more comfortable.",
+      "Play buttons and interactions dhawal coudnt replicate :P"
+    ]
+  },
+  "qualitative_themes": {
+    "pre_giveup_story": {
+      "base": "respondents who volunteered a free-text answer describing their last give-up (18 of 61 eligible respondents; this field was optional so the other 43 left it blank \u2014 themes below describe this self-selected subsample of 18, not all eligible respondents).",
+      "n_answered": 18,
+      "d": 61,
+      "themes": [
+        {
+          "theme": "Switched off-platform (YouTube / Instagram / another app)",
+          "freq": 7,
+          "pct_of_answered": 38.9,
+          "paraphrase": "Several respondents said that when deciding dragged they left the app entirely \u2014 opening YouTube or Instagram instead of continuing to browse Netflix.",
+          "implication": "Corroborates the C4 off-platform leak measured quantitatively; the leak destination named unprompted is consistently YouTube or social video."
+        },
+        {
+          "theme": "Defaulted to a familiar rewatch",
+          "freq": 3,
+          "pct_of_answered": 16.7,
+          "paraphrase": "Some respondents said they gave up searching and put on something they'd already seen rather than picking something new.",
+          "implication": "A 'quick rewatch' shortcut already exists informally; the prototype's 'shows already watched' component maps directly onto this coping behaviour."
+        },
+        {
+          "theme": "Time pressure from the meal itself",
+          "freq": 3,
+          "pct_of_answered": 16.7,
+          "paraphrase": "A few respondents described the meal finishing, or food going cold, before they had settled on something to watch.",
+          "implication": "The meal is a hard deadline, not just a mood \u2014 supports treating 'meal-window cost' as a real cost, not only an annoyance rating."
+        },
+        {
+          "theme": "No problem \u2014 decides in advance",
+          "freq": 2,
+          "pct_of_answered": 11.1,
+          "paraphrase": "A couple of respondents said they never face this because they choose what to watch before sitting down.",
+          "implication": "Direct qualitative echo of the C3 falsifier segment; this behaviour is a real substitute, not just a survey artifact."
+        },
+        {
+          "theme": "Browsed without resolving (decision paralysis)",
+          "freq": 2,
+          "pct_of_answered": 11.1,
+          "paraphrase": "A couple of respondents described browsing around \u2014 food content, or simply not having a next show queued \u2014 without landing on anything.",
+          "implication": "Supports a queueing/continuation feature, not just faster search, for the post-finale moment."
+        },
+        {
+          "theme": "Co-viewing / social constraint",
+          "freq": 1,
+          "pct_of_answered": 5.6,
+          "paraphrase": "One respondent noted difficulty finding something suitable to watch with parents.",
+          "implication": "A minority but distinct segment (shared viewing) whose friction is about suitability, not volume of choice; too small a signal to size here."
+        }
+      ]
+    },
+    "post_one_thing": {
+      "base": "of 37 post respondents, 35 gave a substantive answer to 'what is the ONE thing that would make you actually use it'.",
+      "n_answered": 35,
+      "d": 37,
+      "themes": [
+        {
+          "theme": "Better / more personalised recommendations",
+          "freq": 13,
+          "pct_of_answered": 37.1,
+          "paraphrase": "The largest single group asked for recommendations more closely matched to their own taste and watch history, several explicitly contrasting this with the prototype's current suggestions.",
+          "implication": "Recommendation relevance is the single biggest lever on stated adoption \u2014 consistent with the weak 29.4%(prior report)/current-data top-box headline desirability; this is the primary 'improve' target, not a new component."
+        },
+        {
+          "theme": "Mood-based filtering valued / requested",
+          "freq": 7,
+          "pct_of_answered": 20.0,
+          "paraphrase": "A number of respondents pointed to the mood filter as the thing they want more of or that already works for them.",
+          "implication": "Corroborates the quantitative component-usefulness ranking, where mood filters is the second most-cited useful part."
+        },
+        {
+          "theme": "Adapting to meal context (episode length / time of day)",
+          "freq": 3,
+          "pct_of_answered": 8.6,
+          "paraphrase": "A few respondents wanted the row to account for how long they actually have \u2014 for example shorter episodes so the show can finish with the meal.",
+          "implication": "A concrete, buildable refinement: surface episode runtime and bias toward meal-length content."
+        },
+        {
+          "theme": "Less cognitive effort / fewer choices to weigh",
+          "freq": 3,
+          "pct_of_answered": 8.6,
+          "paraphrase": "Some respondents said the appeal is simply not having to think \u2014 clicking something already picked for them.",
+          "implication": "Validates the core mechanic (pre-narrowing choice) independent of recommendation quality."
+        },
+        {
+          "theme": "Short-form / snackable content style",
+          "freq": 2,
+          "pct_of_answered": 5.7,
+          "paraphrase": "A couple of respondents compared the desired experience to short-form video feeds such as YouTube Shorts.",
+          "implication": "A different product shape (bite-sized clips) than the current best-episode-pick mechanic; worth flagging as a distinct idea to test, not folding into the current feature."
+        },
+        {
+          "theme": "Interface / discoverability friction (unlabeled thumbnails)",
+          "freq": 1,
+          "pct_of_answered": 2.9,
+          "paraphrase": "One respondent found it hard to identify shows from cover art alone and wanted titles shown.",
+          "implication": "Minor UI fix, low cost, plausibly affects the 'about the same' speed-perception segment."
+        },
+        {
+          "theme": "Already decides in advance \u2014 feature doesn't apply",
+          "freq": 1,
+          "pct_of_answered": 2.9,
+          "paraphrase": "One respondent restated that they plan ahead regardless of platform, so the feature has little to add for them.",
+          "implication": "Same falsifier segment reappearing in the post survey \u2014 this group is unlikely to adopt regardless of iteration."
+        },
+        {
+          "theme": "Off-topic or non-committal answers",
+          "freq": 5,
+          "pct_of_answered": 14.3,
+          "paraphrase": "A handful of answers were non-answers or unrelated one-word replies (e.g. uncertainty about the question, or unrelated words).",
+          "implication": "Signals response-quality noise in this open field; treat single-word answers as low-confidence evidence."
+        }
+      ]
+    },
+    "post_confusion": {
+      "base": "only 4 of 37 post respondents reported anything confusing or in the way; 33 left this blank or wrote 'no' / 'nothing'.",
+      "n_answered": 4,
+      "d": 37,
+      "themes": [
+        {
+          "theme": "Prototype fidelity blurred the test (felt too much like real Netflix)",
+          "freq": 2,
+          "pct_of_answered": 50.0,
+          "paraphrase": "Two respondents said the prototype resembled the real Netflix UI closely enough that it was unclear what they were meant to be evaluating, and one wanted a brief orientation before starting.",
+          "implication": "A study-design note more than a product finding: low reported confusion may partly reflect respondents not clearly distinguishing the feature from the baseline UI, which argues for treating the strongly positive reaction numbers with some caution."
+        },
+        {
+          "theme": "Wants a persistently visible, dedicated section",
+          "freq": 1,
+          "pct_of_answered": 25.0,
+          "paraphrase": "One respondent suggested a clearly dedicated 'Watch While You Eat' section would reduce anxiety about finding it again.",
+          "implication": "Supports a persistent placement/entry point rather than a one-off row, as a low-cost iteration."
+        },
+        {
+          "theme": "Non-functional prototype elements",
+          "freq": 1,
+          "pct_of_answered": 25.0,
+          "paraphrase": "One respondent noted that some interactive elements (play buttons) weren't functional in the prototype.",
+          "implication": "Expected fake-door/prototype limitation, not a product signal."
+        }
+      ]
+    }
+  },
+  "kpi_framework": {
+    "core_kpis": [
+      {
+        "id": "K1",
+        "category": "Mealtime viewing frequency",
+        "name": "Weekly Meal-Occasion Rate",
+        "definition": "Share of eligible respondents who watch something at a meal 3+ times a week.",
+        "formula": "n(meal_sessions_per_week in {3-5, 6-10, 10+}) / n(eligible pre respondents)",
+        "numerator": 52,
+        "denominator": 61,
+        "value_pct": 85.2,
+        "sample_size": 61,
+        "source_question": "pre_q1 \u2014 'In a typical week, how many times do you watch on a streaming app while eating a meal?'",
+        "interpretation": "Mealtime streaming is a frequent, recurring occasion for the large majority of eligible respondents, not an edge case.",
+        "limitation": "Self-reported frequency band, not logged behaviour; bands are coarse (e.g. '3-5') so exact counts aren't recoverable."
+      },
+      {
+        "id": "K2",
+        "category": "Decision friction",
+        "name": "High-Friction Decision Rate",
+        "definition": "Share of eligible respondents whose last mealtime decision took more than 3 minutes.",
+        "formula": "n(decision_time in {3-5, 5-10, Over 10 minutes}) / n(eligible pre respondents)",
+        "numerator": 36,
+        "denominator": 61,
+        "value_pct": 59.0,
+        "sample_size": 61,
+        "source_question": "pre \u2014 'How long did you spend deciding before you actually started?'",
+        "interpretation": "A majority spend more than 3 minutes deciding; the tail is meaningful too \u2014 18.0% spend over 10 minutes.",
+        "limitation": "Recall of a single past instance, not a timed measurement; 1 respondent who 'never started' is excluded from this rate."
+      },
+      {
+        "id": "K3",
+        "category": "Abandonment",
+        "name": "Any-Abandonment Rate",
+        "definition": "Share of eligible respondents who gave up at least once in the last month after opening a streaming app at a meal.",
+        "formula": "n(giveup_freq in {Once or twice, A few times, Often}) / n(eligible pre respondents)",
+        "numerator": 48,
+        "denominator": 61,
+        "value_pct": 78.7,
+        "sample_size": 61,
+        "source_question": "pre \u2014 'In the last month, how often did you open a streaming app at a meal but give up without watching anything?'",
+        "interpretation": "Abandonment is broad at least-once, but the chronic form is narrow: only 13.1% report 'Often'. Report both \u2014 breadth is not the same as severity.",
+        "limitation": "One-month recall window; no distinction between a 30-second reconsideration and a multi-minute abandoned search."
+      },
+      {
+        "id": "K4",
+        "category": "Off-platform leak",
+        "name": "Off-Platform Leak Rate",
+        "definition": "Share of eligible respondents whose reported action, the last time deciding dragged, left Netflix (YouTube, social media, or another app) rather than staying on the platform.",
+        "formula": "n(action_when_dragged in {YouTube, social media, another app}) / n(eligible pre respondents)",
+        "numerator": 33,
+        "denominator": 61,
+        "value_pct": 54.1,
+        "sample_size": 61,
+        "source_question": "pre \u2014 'The last time deciding dragged at a meal, what did you actually do?'",
+        "interpretation": "YouTube alone accounts for 23 of 33 off-platform instances \u2014 the single largest destination and the clearest commercially relevant loss.",
+        "limitation": "Question is framed around 'the last time deciding dragged', so it presupposes a drag event rather than being conditioned on the abandonment question (K3); not a strict funnel step."
+      },
+      {
+        "id": "K5",
+        "category": "Perceived speed-up",
+        "name": "Perceived Speed-Up Rate",
+        "definition": "Share of post-prototype respondents who rated finding something with the feature as faster or much faster than their normal routine.",
+        "formula": "n(perceived_speed in {Faster, Much faster}) / n(post respondents)",
+        "numerator": 22,
+        "denominator": 37,
+        "value_pct": 59.5,
+        "sample_size": 37,
+        "source_question": "post \u2014 \"...finding something with the 'Watch While You Eat' row was...\"",
+        "interpretation": "A majority perceive a speed-up, but a large minority (about 4 in 10) felt no improvement or worse \u2014 this is a real, not unanimous, effect.",
+        "limitation": "Stated perception in a single test session, not a timed A/B comparison against the normal routine."
+      },
+      {
+        "id": "K6",
+        "category": "Struggle reduction",
+        "name": "Struggle Reduction Rate",
+        "definition": "Share of post-prototype respondents who said the feature reduced the 'what do I put on' struggle, clearly or somewhat.",
+        "formula": "n(reduced_struggle in {Yes clearly, Somewhat}) / n(post respondents)",
+        "numerator": 35,
+        "denominator": 37,
+        "value_pct": 94.6,
+        "sample_size": 37,
+        "source_question": "post \u2014 \"Did it reduce the 'what do I put on' struggle for you specifically?\"",
+        "interpretation": "Very high on the surface, but only 21.6% chose the strong option ('Yes, clearly'); most of the 94.6% is the softer 'Somewhat'.",
+        "limitation": "Self-report after a single short exposure; does not measure an actual repeated-use reduction in struggle."
+      },
+      {
+        "id": "K7",
+        "category": "Start intention",
+        "name": "Start-Intention Rate",
+        "definition": "Share of post-prototype respondents who said they would have started watching (easily or eventually) rather than probably given up, had this been a real meal.",
+        "formula": "n(start_intention in {Started easily, Started eventually}) / n(post respondents)",
+        "numerator": 35,
+        "denominator": 37,
+        "value_pct": 94.6,
+        "sample_size": 37,
+        "source_question": "post \u2014 'If that had been a real meal just now, would you have started watching \u2014 or given up?'",
+        "interpretation": "The strongest reaction measure in the study; directly answers the abandonment claim (C3) with a hypothetical intention, though only 45.9% chose the confident 'started easily' option.",
+        "limitation": "Hypothetical/stated intention captured immediately after prototype exposure, not an observed behaviour at a real meal."
+      },
+      {
+        "id": "K8",
+        "category": "On-platform intention",
+        "name": "Retention Intention Rate",
+        "definition": "Share of post-prototype respondents who said the feature would keep them on Netflix at a meal instead of switching, yes or maybe.",
+        "formula": "n(stay_on_netflix in {Yes, Maybe}) / n(post respondents)",
+        "numerator": 32,
+        "denominator": 37,
+        "value_pct": 86.5,
+        "sample_size": 37,
+        "source_question": "post \u2014 'Would this keep you on Netflix at a meal instead of switching to something else?'",
+        "interpretation": "Directly answers the C4 leak claim; among the matched respondents who had reported an off-platform leak pre-survey, 89.5% now say yes/maybe (n=19) \u2014 see matched analysis.",
+        "limitation": "'Maybe' (the largest single response) is counted toward retention; a stricter definition using only 'Yes' would give a materially lower rate \u2014 reported separately in the dashboard."
+      },
+      {
+        "id": "K9",
+        "category": "Headline desirability",
+        "name": "Top-Box Likelihood to Use",
+        "definition": "Share of post-prototype respondents rating likelihood to use the feature at their next meal 8 or above out of 10.",
+        "formula": "n(likelihood_use_next >= 8) / n(post respondents)",
+        "numerator": 12,
+        "denominator": 37,
+        "value_pct": 32.4,
+        "sample_size": 37,
+        "source_question": "post \u2014 'How likely are you to use this at your next meal?' (0-10)",
+        "interpretation": "The weakest of the reaction measures (mean 6.14, median 6.0) and the one requiring the most commitment from the respondent \u2014 this is the number the go/no-go decision should weight most heavily, not the softer reaction measures above.",
+        "limitation": "Single-item stated intention; no observed repeat-use or actual adoption data exists to validate it against."
+      }
+    ],
+    "guardrail_kpi": {
+      "id": "G1",
+      "category": "Guardrail",
+      "name": "Already-Seen / Would-Skip Rate",
+      "definition": "Share of post-prototype respondents who said the suggested episodes felt like content they'd already skip, rather than content they'd want.",
+      "formula": "n(guardrail_already_seen == \"Mostly things I'd already skip\") / n(post respondents who answered this item)",
+      "numerator": 0,
+      "denominator": 37,
+      "value_pct": 0.0,
+      "sample_size": 37,
+      "source_question": "post \u2014 \"Of the episodes it suggested, did they feel like things you'd want, or things you'd already skip?\"",
+      "interpretation": "No respondent chose the 'would already skip' pole; the split is 'Mostly things I'd want' (24/37) vs 'A mix' (13/37). No kill-switch signal in the current data \u2014 recommendation relevance is not failing outright.",
+      "limitation": "In the current Excel export this item has 0 missing values and real variance (unlike a prior report on this project, which flagged a related taste-match item as an unusable default value). Because a genuinely degenerate/default-only response pattern would invalidate this KPI, it should be re-checked against the live survey tool export (not just this snapshot) before being relied on for a go/no-go call."
+    }
+  },
+  "spec_crosscheck": {
+    "screener_matches_spec": true,
+    "notes": [
+      "Spec S1/S2/S3 screener rules (age Under 18 or 31+; streaming freq Rarely; never watches while eating) match the screener independently recomputed in this analysis and reproduce the sheet's own screened_out flag exactly.",
+      "Spec's abandonment question (pre Q4) lists 5 options including 'Almost every time'; the export contains only 4 distinct values (Never / Once or twice / A few times / Often) \u2014 'Almost every time' received zero responses in this dataset, it is not a missing category.",
+      "Spec's leak question (pre Q6) lists 6 options including 'Gave up and just ate'; the export contains only 5 distinct values \u2014 'Gave up and just ate' received zero responses.",
+      "Spec's useful-components question (post Q6) lists a 'None' option; it does not appear in the export \u2014 every post respondent who answered selected at least one component as useful.",
+      "Spec's guardrail question (post Q5) options are 'Mostly want / A mix / Mostly already-seen or would-skip'; the export's two observed values ('Mostly things I'd want', 'A mix') match the spec's first two options, and zero respondents selected the failure option \u2014 consistent with the guardrail finding reported in Section 6 of the dashboard.",
+      "The post sheet contains one item \u2014 'How well did the episodes it showed you match your taste?' (taste_match, scale 3-5) \u2014 that does NOT appear in the official post-survey question list (Q1-Q9) in the spec doc. It is treated here as a supplementary, non-spec item and reported separately (Section 4 / Section 6 of the dashboard), not folded into any spec-defined KPI.",
+      "The spec's own measurement-plan section refers to the likelihood-to-use top-box KPI as 'post_q9' while also defining Q9 as an open-text confusion question and Q7 (a 0-10 slider) as 'magnitude of relief' \u2014 an internal inconsistency in the spec document's question numbering. This analysis mapped columns by matching each column's actual header text to the closest spec question rather than by position/number, and used the column literally titled 'How likely are you to use this at your next meal?' as the likelihood-to-use KPI.",
+      "post 'stay_on_netflix' (leak-reversal) question: spec defines a single option 'No, I'd still switch'; the export splits this into two distinct values, 'No' (4 responses) and \"I'd still switch\" (1 response). Both are treated as non-retention for the Retention Intention KPI, consistent with either reading of the spec."
+    ],
+    "preregistered_behavioural_thresholds": {
+      "source": "Measurement Plan doc, section 2 (viability decision rule) \u2014 computed from an event log (row_impression, row_click, feature_dwell) this survey-only dataset does not contain; reported here for context on what 'validated' would require, not as a value computed here.",
+      "relative_ctr_uplift_threshold": "\u22651.5\u00d7 (feature CTR \u00f7 baseline CTR, within-session)",
+      "feature_adoption_threshold": "\u226530% of qualified sessions with \u22651 feature row click",
+      "feature_dwell_threshold": "\u226520 seconds median dwell among sessions that clicked the feature",
+      "verdict_rule": "validated only if all three hold; weak/inconclusive if uplift clears but dwell is low; not validated if uplift \u22641 or give-up dominates."
+    },
+    "retention_and_clv_formulas_from_spec": {
+      "retention_rate": "(customers at end \u2212 new customers) \u00f7 customers at start \u00d7 100 \u2014 cannot be measured in a single-session fake-door test; use as the named business goal, with give-up rate and off-platform leak reported as its leading indicators.",
+      "customer_lifetime_value": "Margin \u00d7 [ RR \u00f7 (1 + Discount \u2212 RR) ] \u2014 usable only as an illustrative, clearly-labelled sensitivity model, never as a measured value."
+    }
+  }
+}
