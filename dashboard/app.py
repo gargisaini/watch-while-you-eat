@@ -469,60 +469,107 @@ elif page.startswith("9."):
                "The survey-response KPIs and the requested-marketing-metric tables now live in "
                "**12. KPI (archived)**.")
 
-    def measured_kpi(name, value, delta, means, calculation, relevancy):
+    def measured_kpi(name, value, delta, narrative):
         c1, c2 = st.columns([1, 3])
         c1.metric(name, value, delta)
         with c2:
-            st.markdown(f"**Means**: {means}")
-            st.markdown(f"**Calculation**: {calculation}")
-            st.markdown(f"*Relevancy*: {relevancy}")
+            st.markdown(narrative)
         st.markdown("---")
 
     measured_kpi(
-        "Relative CTR Uplift", f"{CTR_UPLIFT:.2f}×", f"threshold ≥1.5× · clears",
-        "How much more often the feature row gets clicked than an average generic row, within the same sessions.",
-        f"Feature CTR ÷ Baseline CTR = {CTR_FEAT:.3f}% ÷ {CTR_GEN:.3f}% = **{CTR_UPLIFT:.2f}×** "
-        f"(feature: {_B['feature_clicks']} clicks/{_B['feature_impr']:,} impressions; generic: "
-        f"{_B['generic_clicks']} clicks/{_B['generic_impr']:,} impressions, `payload.count` convention).",
-        "The centrepiece formula from the methodology doc; the only one of the five that clearly favours the feature.")
+        "Relative CTR Uplift", f"{CTR_UPLIFT:.2f}×", "threshold ≥1.5× · clears",
+        "Click-through rate (CTR) is the standard measure of how often people click something they're shown — "
+        "clicks divided by impressions — and on its own it doesn't say much, because some rows get more clicks "
+        "just from being familiar or well-positioned, not because people prefer what's in them. Relative CTR "
+        "uplift solves that by comparing the feature row's CTR against the average CTR of the app's other, "
+        "generic rows within the same sessions, which isolates whether people are clicking this specific row "
+        "because of what it is, rather than just because it's in front of them. That distinction matters here "
+        "specifically because the whole premise of \"Watch While You Eat\" is that people want a faster way to "
+        "decide, not just another row to browse — a high uplift is evidence of that specific preference, not "
+        f"general clickiness. For this feature, that comparison came out to a feature-row CTR of {CTR_FEAT:.3f}% "
+        f"({_B['feature_clicks']} clicks across {_B['feature_impr']:,} impressions) against a generic-row "
+        f"baseline of {CTR_GEN:.3f}% ({_B['generic_clicks']} clicks across {_B['generic_impr']:,} impressions) "
+        f"— a relative uplift of {CTR_UPLIFT:.2f}×, using the `payload.count` impression convention (a second "
+        "convention, counting raw impression events, gives a different absolute CTR but the same uplift "
+        "direction; the convention has to be stated because the two disagree substantially in absolute terms). "
+        f"That {CTR_UPLIFT:.2f}× clears the project's own pre-registered viability threshold of 1.5×, making "
+        "this the centrepiece metric from the methodology doc and the only one of the five behavioural KPIs "
+        f"here that clearly favours the feature. It's worth remembering, though, that {_B['feature_clicks']} "
+        "total feature clicks is a genuinely thin absolute base — a ratio can look strong while still resting "
+        "on very few real events, and one or two additional or missing clicks would move this number "
+        "meaningfully.")
 
     measured_kpi(
         "Content-to-Play (feature)", f"{C2P_FEAT_SESS:.1f}%", f"session grain · event grain {C2P_FEAT_EVT:.1f}%",
-        "Of people who opened a title specifically from the feature row, what share pressed play, vs the "
-        "app-wide rate at the same grain.",
-        f"**Session grain**: {_B['c2p_feat_sess_num']}/{_B['c2p_feat_sess_den']} = **{C2P_FEAT_SESS:.1f}%** "
-        f"(feature) vs {_B['c2p_all_sess_num']}/{_B['c2p_all_sess_den']} = **{C2P_ALL_SESS:.1f}%** (app-wide). "
-        f"**Event grain**: {_B['c2p_feat_evt_num']}/{_B['c2p_feat_evt_den']} = **{C2P_FEAT_EVT:.1f}%** (feature) "
-        f"vs {_B['c2p_all_evt_num']}/{_B['c2p_all_evt_den']} = **{C2P_ALL_EVT:.1f}%** (app-wide). "
-        "Report grain-matched only — never compare across grains.",
-        "The one metric that goes against the feature — trails the app-wide rate at every comparable grain, "
-        "the opposite direction from CTR.")
+        "Content-to-play conversion measures the very last step of the decision funnel: of the people who got "
+        "far enough to open a specific title, how many actually pressed play, rather than backing out and going "
+        "somewhere else. It's a natural complement to CTR — CTR tells you whether people are drawn to click "
+        "into the feature at all, while this tells you whether, once they're looking at something it suggested, "
+        "they actually follow through. Because sessions and individual open-then-play events aren't the same "
+        "unit, this has to be measured at a consistent grain to mean anything: at the session level, "
+        f"{_B['c2p_feat_sess_num']} of the {_B['c2p_feat_sess_den']} sessions that opened a title from the "
+        f"feature row went on to press play, a {C2P_FEAT_SESS:.1f}% conversion, against an app-wide "
+        f"session-level rate of {C2P_ALL_SESS:.1f}% ({_B['c2p_all_sess_num']} of {_B['c2p_all_sess_den']}); at "
+        f"the event level, {_B['c2p_feat_evt_num']} of {_B['c2p_feat_evt_den']} feature title-opens converted "
+        f"to a play ({C2P_FEAT_EVT:.1f}%), against an app-wide event-level rate of {C2P_ALL_EVT:.1f}% "
+        f"({_B['c2p_all_evt_num']} of {_B['c2p_all_evt_den']}). Whichever grain is used, the two numbers being "
+        "compared have to be from the same grain — comparing a session-level feature figure against an "
+        "event-level app-wide figure would be comparing two different things. At both grains, the feature "
+        "actually trails the app-wide rate by five to seven points, which is the opposite direction from the "
+        "CTR finding above, and the first real behavioural signal in this project that points against the "
+        "feature rather than just falling short of a threshold. A large part of why this number is worth "
+        f"treating cautiously: {_B['top_title_opens']} of the {_B['c2p_feat_evt_den']} feature title-opens, and "
+        f"{_B['top_title_plays']} of the {_B['feature_plays']} plays, are all the same single title (Breaking "
+        "Bad S5E13) — meaning a meaningful share of what looks like \"feature conversion\" is really describing "
+        "how one tile performed in a very small prototype catalogue, not the feature mechanic in general.")
 
     measured_kpi(
         "Feature Adoption Rate", f"{ADOPTION:.1f}%",
         f"n={_B['adoption_num']}/{_B['adoption_den']} · threshold ≥30% · FAILS",
-        "Of everyone who reached the point where they could see the feature, what share engaged with it.",
-        f"Sessions with ≥1 feature click ÷ sessions reaching home = {_B['adoption_num']} ÷ "
-        f"{_B['adoption_den']} = **{ADOPTION:.1f}%**.",
-        "Has an explicit pre-registered threshold (≥30%) — currently fails it.")
+        "Feature adoption rate answers a different question than CTR does: not whether people click the row "
+        "when it's in front of them, but whether they engage with it at all across a typical session — the "
+        "standard distinction growth and product teams draw between exposure-driven interest and something "
+        "people actually pick up as part of how they use the product. It's calculated as the share of sessions "
+        "that reached the home screen (where the feature could be seen) that also included at least one click "
+        f"on the feature row: {_B['adoption_num']} of {_B['adoption_den']} such sessions, or {ADOPTION:.1f}%. "
+        "Unlike CTR, this metric has an explicit target attached to it in the project's own pre-registered "
+        "measurement plan — a threshold of 30% adoption was set before data collection began, specifically so "
+        f"the go/no-go decision wouldn't be made by eyeballing a number after the fact. At {ADOPTION:.1f}%, "
+        "this result falls well short of that bar, and because the threshold was fixed in advance, that's a "
+        "real signal rather than something to explain away: whatever is driving CTR up isn't yet translating "
+        "into the kind of routine engagement the feature would need to matter at scale.")
 
     measured_kpi(
         "Feature Dwell Time", f"n={len(_B['dwell_ms'])}", "insufficient",
-        "How long someone engages with the feature once clicked in.",
-        "Median of recorded dwell events — currently "
-        f"{len(_B['dwell_ms'])} events only ({', '.join(f'{ms:,}ms' for ms in _B['dwell_ms'])}).",
-        "Threshold is ≥20s median — the right question, not yet answerable.")
+        "Dwell time is the standard way products measure whether something holds someone's attention once "
+        "they've engaged with it, rather than just getting a passing glance — here, how long someone spends "
+        "with the feature after clicking into it. The project's pre-registered threshold, a median of at least "
+        "20 seconds, exists specifically to filter out curiosity clicks that don't turn into real engagement "
+        "from ones that do. The problem with reporting this metric right now isn't the threshold, it's the "
+        "sample behind it: across the entire fake-door test, exactly two dwell events were ever recorded "
+        f"({_B['dwell_ms'][0]:,}ms and {_B['dwell_ms'][1]:,}ms). Two data points cannot support a median, a "
+        "distribution, or any claim about typical behaviour — this isn't a metric that fell short of its "
+        "target, it's a metric that doesn't yet have enough data to be evaluated at all, and it should never "
+        "be shown as a clean percentage or a pass/fail result without that distinction being obvious.")
 
     measured_kpi(
         "Take Rate", f"{TAKE_RATE:.3f}%",
         f"n={_B['feature_plays']} plays · alt convention {TAKE_RATE_ALT:.2f}%",
-        "Of everyone shown the feature row, what share actually pressed play — Netflix's own named metric for "
-        "committed engagement vs curiosity.",
-        f"Feature plays ÷ feature impressions (`payload.count` convention, matching CTR) = "
-        f"{_B['feature_plays']} ÷ {_B['feature_impr']:,} = **{TAKE_RATE:.3f}%**. Alt convention "
-        f"(`row_impression` event count): {_B['feature_plays']}/{_B['feature_impr_events']} = "
-        f"**{TAKE_RATE_ALT:.2f}%** — the convention must travel with the number.",
-        f"Highest-ceiling metric conceptually, but confirmed as the thinnest base of all five (n={_B['feature_plays']}).")
+        "Take rate is the metric Netflix itself uses internally to separate a row that gets clicked from one "
+        "that actually delivers value — of everyone who saw the feature row, what share went all the way "
+        "through to pressing play on something from it, not just opening or browsing it. Conceptually, it's "
+        "the highest-ceiling metric on this list, because it's the one closest to the actual outcome the "
+        "feature is meant to produce. Calculated the same way as CTR (feature plays divided by feature "
+        "impressions, using the same `payload.count` convention so the two numbers are comparable), it comes "
+        f"out to {_B['feature_plays']} plays across {_B['feature_impr']:,} impressions, or {TAKE_RATE:.3f}% — a "
+        "second impression convention, counting raw impression events instead, gives "
+        f"{TAKE_RATE_ALT:.2f}% for the same {_B['feature_plays']} plays, which is why the convention has to "
+        "travel with the number whenever it's cited. The number that actually matters here, though, is the "
+        f"{_B['feature_plays']}: that's {_B['feature_plays']} plays from {_B['feature_play_sessions']} distinct "
+        "sessions, the thinnest base of any metric in this scorecard. A single additional play would move the "
+        "percentage by roughly 17% of its own value, which is why the raw count belongs in front of the "
+        "percentage rather than the other way around — this is a headcount that happens to be expressed as a "
+        "ratio, not a stable statistical result.")
 
 # ============================================================ SECTION 10 ==
 elif page.startswith("10."):
