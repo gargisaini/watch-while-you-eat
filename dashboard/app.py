@@ -464,26 +464,18 @@ elif page.startswith("8."):
 # ============================================================ SECTION 9 ===
 elif page.startswith("9."):
     section_header("KPI Scorecard")
-    st.warning(
-        "**Read the five measured behavioural KPIs below as a set, not as a headline.** Of the five, only "
-        "relative CTR uplift clearly favours the feature; feature adoption fails its pre-registered threshold; "
-        "dwell time and take rate are too thin to trust; content-to-play conversion trails the app-wide "
-        "baseline at every comparable grain. The CTR win is not this section's verdict.", icon="⚖️")
     st.caption("Measured from the live fake-door prototype's event log (960 events, 94 sessions, export "
                "2026-09-18) — not from the survey. These are observed behaviour, not stated intention. "
                "The survey-response KPIs and the requested-marketing-metric tables now live in "
                "**12. KPI (archived)**.")
 
-    def measured_kpi(name, value, delta, means, calculation, relevancy, caveat=None):
+    def measured_kpi(name, value, delta, means, calculation, relevancy):
         c1, c2 = st.columns([1, 3])
         c1.metric(name, value, delta)
         with c2:
-            st.markdown("<span class='badge-strong'>🟢 MEASURED</span>", unsafe_allow_html=True)
             st.markdown(f"**Means**: {means}")
             st.markdown(f"**Calculation**: {calculation}")
             st.markdown(f"*Relevancy*: {relevancy}")
-            if caveat:
-                st.markdown(f"<span class='kpi-note'>⚠️ Caveat: {caveat}</span>", unsafe_allow_html=True)
         st.markdown("---")
 
     measured_kpi(
@@ -492,8 +484,7 @@ elif page.startswith("9."):
         f"Feature CTR ÷ Baseline CTR = {CTR_FEAT:.3f}% ÷ {CTR_GEN:.3f}% = **{CTR_UPLIFT:.2f}×** "
         f"(feature: {_B['feature_clicks']} clicks/{_B['feature_impr']:,} impressions; generic: "
         f"{_B['generic_clicks']} clicks/{_B['generic_impr']:,} impressions, `payload.count` convention).",
-        "The centrepiece formula from the methodology doc; the only one of the five that clearly favours the feature.",
-        f"{_B['feature_clicks']} total feature clicks is a thin absolute base.")
+        "The centrepiece formula from the methodology doc; the only one of the five that clearly favours the feature.")
 
     measured_kpi(
         "Content-to-Play (feature)", f"{C2P_FEAT_SESS:.1f}%", f"session grain · event grain {C2P_FEAT_EVT:.1f}%",
@@ -505,10 +496,7 @@ elif page.startswith("9."):
         f"vs {_B['c2p_all_evt_num']}/{_B['c2p_all_evt_den']} = **{C2P_ALL_EVT:.1f}%** (app-wide). "
         "Report grain-matched only — never compare across grains.",
         "The one metric that goes against the feature — trails the app-wide rate at every comparable grain, "
-        "the opposite direction from CTR.",
-        f"{_B['top_title_opens']} of {_B['c2p_feat_evt_den']} feature title-opens ({_B['top_title_plays']} of "
-        f"{_B['c2p_feat_evt_num']} plays) are a single title (`{_B['top_title']}`) — a meaningful share of this "
-        "reflects one tile's performance in a tiny catalogue, not the mechanic generally. Base is thin at every grain.")
+        "the opposite direction from CTR.")
 
     measured_kpi(
         "Feature Adoption Rate", f"{ADOPTION:.1f}%",
@@ -523,9 +511,7 @@ elif page.startswith("9."):
         "How long someone engages with the feature once clicked in.",
         "Median of recorded dwell events — currently "
         f"{len(_B['dwell_ms'])} events only ({', '.join(f'{ms:,}ms' for ms in _B['dwell_ms'])}).",
-        "Threshold is ≥20s median — the right question, not yet answerable.",
-        f"n={len(_B['dwell_ms'])} is not a measurement. Must never be shown as a standalone percentage or a "
-        "clean result — always with this caveat attached.")
+        "Threshold is ≥20s median — the right question, not yet answerable.")
 
     measured_kpi(
         "Take Rate", f"{TAKE_RATE:.3f}%",
@@ -536,29 +522,7 @@ elif page.startswith("9."):
         f"{_B['feature_plays']} ÷ {_B['feature_impr']:,} = **{TAKE_RATE:.3f}%**. Alt convention "
         f"(`row_impression` event count): {_B['feature_plays']}/{_B['feature_impr_events']} = "
         f"**{TAKE_RATE_ALT:.2f}%** — the convention must travel with the number.",
-        f"Highest-ceiling metric conceptually, but confirmed as the thinnest base of all five (n={_B['feature_plays']}).",
-        f"{_B['feature_plays']} plays from {_B['feature_play_sessions']} sessions; one more play moves the "
-        "percentage ~17% of its own value. Report the raw count as headline, percentage secondary.")
-
-    st.subheader("Still requiring instrumentation")
-    st.markdown("""
-The event log covers the five KPIs above. These three remain uninstrumented — listed with the fields that
-would be needed:
-
-| Behavioural KPI | Event-log fields required |
-|---|---|
-| Actual decision latency | timestamp of row impression to timestamp of play-start event |
-| Funnel conversion (full) | impression → click → play-start → **watch-complete** event sequence; no watch-complete event exists |
-| Cannibalisation rate | play events on other rows/rails for exposed vs unexposed users, same session; needs a holdout arm |
-""")
-    th = R["spec_crosscheck"]["preregistered_behavioural_thresholds"]
-    st.caption(
-        f"The project's own measurement plan pre-registered viability thresholds: relative CTR uplift "
-        f"{th['relative_ctr_uplift_threshold']}, feature adoption {th['feature_adoption_threshold']}, "
-        f"feature dwell {th['feature_dwell_threshold']}. Verdict rule: {th['verdict_rule']} — on the measured "
-        f"values above, uplift clears, adoption fails, and dwell is unanswerable at n={len(_B['dwell_ms'])}, so "
-        "the rule is not satisfied. Note that `src/lib/report-config.ts` in the prototype repo marks these three "
-        "thresholds as PLACEHOLDERS to be confirmed before any pass/fail is published.")
+        f"Highest-ceiling metric conceptually, but confirmed as the thinnest base of all five (n={_B['feature_plays']}).")
 
 # ============================================================ SECTION 10 ==
 elif page.startswith("10."):
@@ -694,3 +658,23 @@ a single-session survey cannot provide. Applicable product/marketing indicators 
         stay=R["solution_validation"]["stay_on_netflix"]["pct_stay"], stay_n=R["solution_validation"]["stay_on_netflix"]["n_stay"], stay_d=R["solution_validation"]["stay_on_netflix"]["d"],
         rec=round(100*R["guardrail"]["distribution"].get("Mostly things I'd want",0)/R["guardrail"]["d"],1), rec_n=R["guardrail"]["distribution"].get("Mostly things I'd want",0), rec_d=R["guardrail"]["d"],
     ))
+
+    st.subheader("Behavioural KPIs still requiring instrumentation")
+    st.markdown("""
+The event log covers five behavioural KPIs, now in Section 9. These three remain uninstrumented — listed with
+the fields that would be needed:
+
+| Behavioural KPI | Event-log fields required |
+|---|---|
+| Actual decision latency | timestamp of row impression to timestamp of play-start event |
+| Funnel conversion (full) | impression → click → play-start → **watch-complete** event sequence; no watch-complete event exists |
+| Cannibalisation rate | play events on other rows/rails for exposed vs unexposed users, same session; needs a holdout arm |
+""")
+    th = R["spec_crosscheck"]["preregistered_behavioural_thresholds"]
+    st.caption(
+        f"The project's own measurement plan pre-registered viability thresholds: relative CTR uplift "
+        f"{th['relative_ctr_uplift_threshold']}, feature adoption {th['feature_adoption_threshold']}, "
+        f"feature dwell {th['feature_dwell_threshold']}. Verdict rule: {th['verdict_rule']} — on the measured "
+        f"values in Section 9, uplift clears, adoption fails, and dwell is unanswerable at n={len(_B['dwell_ms'])}, "
+        "so the rule is not satisfied. Note that `src/lib/report-config.ts` in the prototype repo marks these "
+        "three thresholds as PLACEHOLDERS to be confirmed before any pass/fail is published.")
