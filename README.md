@@ -79,4 +79,6 @@ README.md                                this file
 - The guardrail (already-seen/would-skip) shows no failure signal in the current data (0/37) — see Section 6
   of the dashboard.
 - No business metrics (market share, CAC, CRC, EBITDA, actual retention) are measurable from this dataset;
-  see Section 9 of the dashboard for what would be required.
+  see Section 12 (KPI archived) of the dashboard for what would be required. Section 9 (KPI Scorecard) now
+  holds the measured behavioural KPIs (CTR uplift, content-to-play, adoption, dwell, take rate) computed from
+  the fake-door prototype's event log.

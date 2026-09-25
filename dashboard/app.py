@@ -144,7 +144,7 @@ SECTIONS = [
     "1. Business Problem", "2. Sample / Recruitment Funnel", "3. Problem Validation",
     "4. Solution Validation", "5. Before vs After", "6. Guardrail",
     "7. Feature Component Analysis", "8. Segment Analysis", "9. KPI Scorecard",
-    "10. Key Insights", "11. Recommendations",
+    "10. Key Insights", "11. Recommendations", "12. KPI (archived)",
 ]
 page = st.sidebar.radio("Section", SECTIONS, label_visibility="collapsed")
 st.sidebar.markdown("---")
@@ -469,62 +469,10 @@ elif page.startswith("9."):
         "relative CTR uplift clearly favours the feature; feature adoption fails its pre-registered threshold; "
         "dwell time and take rate are too thin to trust; content-to-play conversion trails the app-wide "
         "baseline at every comparable grain. The CTR win is not this section's verdict.", icon="⚖️")
-    kf = R["kpi_framework"]
-    for k in kf["core_kpis"]:
-        with st.container():
-            c1, c2 = st.columns([1, 3])
-            c1.metric(k["name"], f"{k['value_pct']}%", f"n={k['numerator']}/{k['denominator']}")
-            with c2:
-                st.markdown(f"**{k['category']}** — {k['definition']}")
-                st.markdown(f"`{k['formula']}`")
-                st.markdown(f"*Interpretation*: {k['interpretation']}")
-                st.markdown(f"<span class='kpi-note'>Source: {k['source_question']} · Limitation: {k['limitation']}</span>",
-                            unsafe_allow_html=True)
-            st.markdown("---")
-
-    st.subheader("Guardrail KPI")
-    g = kf["guardrail_kpi"]
-    c1, c2 = st.columns([1, 3])
-    c1.metric(g["name"], f"{g['value_pct']}%", f"n={g['numerator']}/{g['denominator']}")
-    with c2:
-        st.markdown(f"**{g['category']}** — {g['definition']}")
-        st.markdown(f"`{g['formula']}`")
-        st.markdown(f"*Interpretation*: {g['interpretation']}")
-        st.markdown(f"<span class='kpi-note'>Source: {g['source_question']} · Limitation: {g['limitation']}</span>",
-                    unsafe_allow_html=True)
-
-    st.subheader("Marketing / business metrics")
-    st.markdown("""
-The assignment brief also asks for market share, value share, volume share, CAC, CRC and EBITDA. **None of these
-are measurable from this dataset** — they require external market sizing, cost data and a live billing system that
-a single-session survey cannot provide. Applicable product/marketing indicators from this study instead:
-
-| Metric | Value | What it stands in for |
-|---|---|---|
-| Feature awareness | {noticed}% (n={noticed_n}/{noticed_d}) | "reach" of the feature within the tested audience |
-| Feature adoption intent | {top_box}% top-box (n={tb_n}/{tb_d}) | stated intent; the *observed* take rate and adoption rate are measured below |
-| Off-platform leakage (pre) | {leak}% (n={leak_n}/{leak_d}) | the addressable "value leak" the feature targets |
-| Retention intent | {stay}% (n={stay_n}/{stay_d}) | proxy for "retention lift" — stated, not observed |
-| Recommendation relevance | {rec}% "mostly wanted" (n={rec_n}/{rec_d}) | proxy for content-match quality |
-
-| Marketing metric requested | Status |
-|---|---|
-| Market share / value share / volume share | **Not measurable from current dataset** — requires competitor and category revenue/volume data |
-| CAC (customer acquisition cost) | **Not measurable** — requires marketing spend and acquisition counts |
-| CRC (customer retention cost) | **Not measurable** — requires retention program spend |
-| EBITDA | **Not measurable** — requires full P&L data |
-| Actual retention / revenue impact | **Not measurable** — this is a single-session fake-door test with no time series or control cohort |
-""".format(
-        noticed=R["solution_validation"]["noticed_row"]["pct"], noticed_n=R["solution_validation"]["noticed_row"]["n"], noticed_d=R["solution_validation"]["noticed_row"]["d"],
-        top_box=R["solution_validation"]["likelihood_use_next"]["pct_top_box_8plus"], tb_n=R["solution_validation"]["likelihood_use_next"]["n_top_box_8plus"], tb_d=R["solution_validation"]["likelihood_use_next"]["d"],
-        leak=R["C4_leak"]["pct_off_platform"], leak_n=R["C4_leak"]["n_off_platform"], leak_d=R["C4_leak"]["d"],
-        stay=R["solution_validation"]["stay_on_netflix"]["pct_stay"], stay_n=R["solution_validation"]["stay_on_netflix"]["n_stay"], stay_d=R["solution_validation"]["stay_on_netflix"]["d"],
-        rec=round(100*R["guardrail"]["distribution"].get("Mostly things I'd want",0)/R["guardrail"]["d"],1), rec_n=R["guardrail"]["distribution"].get("Mostly things I'd want",0), rec_d=R["guardrail"]["d"],
-    ))
-
-    st.subheader("Measured behavioural KPIs")
     st.caption("Measured from the live fake-door prototype's event log (960 events, 94 sessions, export "
-               "2026-09-18) — not from the survey. These are observed behaviour, not stated intention.")
+               "2026-09-18) — not from the survey. These are observed behaviour, not stated intention. "
+               "The survey-response KPIs and the requested-marketing-metric tables now live in "
+               "**12. KPI (archived)**.")
 
     def measured_kpi(name, value, delta, means, calculation, relevancy, caveat=None):
         c1, c2 = st.columns([1, 3])
@@ -683,3 +631,66 @@ elif page.startswith("11."):
   recommendation quality as settled (Section 6).
 - **Targeted test with the "have to figure it out" segment** specifically, since demand concentrates there.
 """)
+
+# ============================================================ SECTION 12 ==
+elif page.startswith("12."):
+    section_header("KPI (archived)",
+                   "Survey-response KPIs and the requested-marketing-metric tables, moved out of "
+                   "9. KPI Scorecard so that section carries only the measured behavioural KPIs")
+    st.info("**These are survey-response measures, not business metrics.** They record what respondents said, "
+            "not what they did. The observed behavioural KPIs (CTR uplift, content-to-play, adoption, dwell, "
+            "take rate) are in **9. KPI Scorecard**.", icon="🗄️")
+
+    st.subheader("Core survey KPIs")
+    kf = R["kpi_framework"]
+    for k in kf["core_kpis"]:
+        with st.container():
+            c1, c2 = st.columns([1, 3])
+            c1.metric(k["name"], f"{k['value_pct']}%", f"n={k['numerator']}/{k['denominator']}")
+            with c2:
+                st.markdown(f"**{k['category']}** — {k['definition']}")
+                st.markdown(f"`{k['formula']}`")
+                st.markdown(f"*Interpretation*: {k['interpretation']}")
+                st.markdown(f"<span class='kpi-note'>Source: {k['source_question']} · Limitation: {k['limitation']}</span>",
+                            unsafe_allow_html=True)
+            st.markdown("---")
+
+    st.subheader("Guardrail KPI")
+    g = kf["guardrail_kpi"]
+    c1, c2 = st.columns([1, 3])
+    c1.metric(g["name"], f"{g['value_pct']}%", f"n={g['numerator']}/{g['denominator']}")
+    with c2:
+        st.markdown(f"**{g['category']}** — {g['definition']}")
+        st.markdown(f"`{g['formula']}`")
+        st.markdown(f"*Interpretation*: {g['interpretation']}")
+        st.markdown(f"<span class='kpi-note'>Source: {g['source_question']} · Limitation: {g['limitation']}</span>",
+                    unsafe_allow_html=True)
+
+    st.subheader("Marketing / business metrics")
+    st.markdown("""
+The assignment brief also asks for market share, value share, volume share, CAC, CRC and EBITDA. **None of these
+are measurable from this dataset** — they require external market sizing, cost data and a live billing system that
+a single-session survey cannot provide. Applicable product/marketing indicators from this study instead:
+
+| Metric | Value | What it stands in for |
+|---|---|---|
+| Feature awareness | {noticed}% (n={noticed_n}/{noticed_d}) | "reach" of the feature within the tested audience |
+| Feature adoption intent | {top_box}% top-box (n={tb_n}/{tb_d}) | stated intent; the *observed* take rate and adoption rate are measured in Section 9 |
+| Off-platform leakage (pre) | {leak}% (n={leak_n}/{leak_d}) | the addressable "value leak" the feature targets |
+| Retention intent | {stay}% (n={stay_n}/{stay_d}) | proxy for "retention lift" — stated, not observed |
+| Recommendation relevance | {rec}% "mostly wanted" (n={rec_n}/{rec_d}) | proxy for content-match quality |
+
+| Marketing metric requested | Status |
+|---|---|
+| Market share / value share / volume share | **Not measurable from current dataset** — requires competitor and category revenue/volume data |
+| CAC (customer acquisition cost) | **Not measurable** — requires marketing spend and acquisition counts |
+| CRC (customer retention cost) | **Not measurable** — requires retention program spend |
+| EBITDA | **Not measurable** — requires full P&L data |
+| Actual retention / revenue impact | **Not measurable** — this is a single-session fake-door test with no time series or control cohort |
+""".format(
+        noticed=R["solution_validation"]["noticed_row"]["pct"], noticed_n=R["solution_validation"]["noticed_row"]["n"], noticed_d=R["solution_validation"]["noticed_row"]["d"],
+        top_box=R["solution_validation"]["likelihood_use_next"]["pct_top_box_8plus"], tb_n=R["solution_validation"]["likelihood_use_next"]["n_top_box_8plus"], tb_d=R["solution_validation"]["likelihood_use_next"]["d"],
+        leak=R["C4_leak"]["pct_off_platform"], leak_n=R["C4_leak"]["n_off_platform"], leak_d=R["C4_leak"]["d"],
+        stay=R["solution_validation"]["stay_on_netflix"]["pct_stay"], stay_n=R["solution_validation"]["stay_on_netflix"]["n_stay"], stay_d=R["solution_validation"]["stay_on_netflix"]["d"],
+        rec=round(100*R["guardrail"]["distribution"].get("Mostly things I'd want",0)/R["guardrail"]["d"],1), rec_n=R["guardrail"]["distribution"].get("Mostly things I'd want",0), rec_d=R["guardrail"]["d"],
+    ))
