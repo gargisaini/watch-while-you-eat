@@ -172,13 +172,19 @@ div[data-testid="stMetric"] {{
     padding: 14px 16px 10px 16px;
 }}
 div[data-testid="stMetricLabel"] {{ color: {MUTED}; }}
-div[data-testid="stMetricValue"] {{ color: {TEXT}; }}
+div[data-testid="stMetricValue"] {{
+    color: {TEXT}; font-size: 2rem !important; font-weight: 700 !important; line-height: 1.2 !important;
+}}
 .kpi-note {{ color: {MUTED}; font-size: 0.82rem; margin-top: -8px; }}
 h1, h2, h3 {{ color: {TEXT}; }}
 .stMarkdown p {{ color: {TEXT}; }}
 .badge-strong {{ background:#1E3A24; color:#8FD19E; padding:2px 8px; border-radius:6px; font-size:0.75rem; }}
 .badge-weak {{ background:#3A2A12; color:#E8C078; padding:2px 8px; border-radius:6px; font-size:0.75rem; }}
 .badge-not {{ background:#3A1414; color:#E88; padding:2px 8px; border-radius:6px; font-size:0.75rem; }}
+.disclaimer-box {{
+    background-color: {WARN}; color: {BG}; font-weight: 700; text-decoration: underline;
+    padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;
+}}
 hr {{ border-color: {CARD_BORDER}; }}
 </style>
 """, unsafe_allow_html=True)
@@ -229,7 +235,7 @@ SECTIONS = [
     "1. Business Problem", "2. Sample / Recruitment Funnel", "3. Problem Validation",
     "4. Solution Validation", "5. Before vs After", "6. Guardrail",
     "7. Feature Component Analysis", "8. Segment Analysis", "9. KPI Scorecard",
-    "10. Key Insights", "11. Recommendations", "12. Business / Financial Metrics", "13. KPI (archived)",
+    "10. Key Insights", "11. Recommendations", "12. Marketing Metrics", "13. KPI (archived)",
 ]
 page = st.sidebar.radio("Section", SECTIONS, label_visibility="collapsed")
 st.sidebar.markdown("---")
@@ -568,7 +574,7 @@ elif page.startswith("9."):
                "2026-09-18) — not from the survey. These are observed behaviour, not stated intention. "
                "The survey-response KPIs and the requested-marketing-metric tables now live in "
                "**13. KPI (archived)**. A hypothetical, if-implemented business/financial projection built "
-               "from these behavioural KPIs is in **12. Business / Financial Metrics**.")
+               "from these behavioural KPIs is in **12. Marketing Metrics**.")
 
     measured_kpi(
         "Relative CTR Uplift", f"{CTR_UPLIFT:.2f}×", "threshold ≥1.5× · clears",
@@ -706,24 +712,15 @@ elif page.startswith("11."):
 
 # ============================================================ SECTION 12 ==
 elif page.startswith("12."):
-    section_header("Business / Financial Metrics")
+    section_header("Marketing Metrics")
     st.markdown("Connects the survey and behavioral evidence to what this looks like in Netflix's own business "
                  "terms — grounded where the project's own data allows, modeled where it doesn't, explicit "
                  "about which is which throughout.")
-    st.warning(
-        "The four metrics below are a hypothetical analysis, not a measured result: what these business "
-        "metrics could look like if Netflix implemented this feature at scale, modeled from the project's own "
-        "real leading indicators. Netflix has not implemented this feature — nothing here is an observed "
-        "outcome.", icon="⚠️")
-
-    st.markdown(f"""
-| Metric | Value | Detailed in |
-|---|---|---|
-| Off-Platform Leak Rate | {R['C4_leak']['pct_off_platform']}% ({R['C4_leak']['n_off_platform']}/{R['C4_leak']['d']}) | §3 |
-| Leak-Cohort Reversal Rate | {R['reversal_C4']['pct_would_stay']}% ({R['reversal_C4']['n_would_stay']}/{R['reversal_C4']['n_denominator']}) | §5 |
-| Stated Retention Intent | {R['solution_validation']['stay_on_netflix']['pct_stay']}% ({R['solution_validation']['stay_on_netflix']['n_stay']}/{R['solution_validation']['stay_on_netflix']['d']}) | §4 |
-| Feature Awareness | {R['solution_validation']['noticed_row']['pct']}% ({R['solution_validation']['noticed_row']['n']}/{R['solution_validation']['noticed_row']['d']}) | §4 |
-""")
+    st.markdown(
+        "<div class='disclaimer-box'>The four metrics below are a hypothetical analysis, not a measured "
+        "result: what these business metrics could look like if Netflix implemented this feature at scale, "
+        "modeled from the project's own real leading indicators. Netflix has not implemented this feature "
+        "— nothing here is an observed outcome.</div>", unsafe_allow_html=True)
 
     measured_kpi(
         "Retention Rate",
@@ -806,6 +803,15 @@ elif page.startswith("12."):
         "from using whole-company operating margin as a stand-in for what a customer actually contributes, "
         "and annualizing a US-specific monthly churn estimate as though it applied globally and indefinitely.")
 
+    st.markdown(f"""
+| Metric | Value | Detailed in |
+|---|---|---|
+| Off-Platform Leak Rate | {R['C4_leak']['pct_off_platform']}% ({R['C4_leak']['n_off_platform']}/{R['C4_leak']['d']}) | §3 |
+| Leak-Cohort Reversal Rate | {R['reversal_C4']['pct_would_stay']}% ({R['reversal_C4']['n_would_stay']}/{R['reversal_C4']['n_denominator']}) | §5 |
+| Stated Retention Intent | {R['solution_validation']['stay_on_netflix']['pct_stay']}% ({R['solution_validation']['stay_on_netflix']['n_stay']}/{R['solution_validation']['stay_on_netflix']['d']}) | §4 |
+| Feature Awareness | {R['solution_validation']['noticed_row']['pct']}% ({R['solution_validation']['noticed_row']['n']}/{R['solution_validation']['noticed_row']['d']}) | §4 |
+""")
+
 # ============================================================ SECTION 13 ==
 elif page.startswith("13."):
     section_header("KPI (archived)",
@@ -857,11 +863,11 @@ a single-session survey cannot provide. Applicable product/marketing indicators 
 | Marketing metric requested | Status |
 |---|---|
 | Market share / value share / volume share | **Not measurable from current dataset** — requires competitor and category revenue/volume data |
-| CAC (customer acquisition cost) | **Not measurable** for this project's own program — requires this project's marketing spend and acquisition counts, which don't exist for a fake-door test. **12. Business / Financial Metrics** uses a different, external CAC figure (Netflix's own company-wide acquisition cost) for a related but distinct purpose — not this project's CAC. |
+| CAC (customer acquisition cost) | **Not measurable** for this project's own program — requires this project's marketing spend and acquisition counts, which don't exist for a fake-door test. **12. Marketing Metrics** uses a different, external CAC figure (Netflix's own company-wide acquisition cost) for a related but distinct purpose — not this project's CAC. |
 | CRC (customer retention cost) | **Not measurable** — requires retention program spend |
 | EBITDA | **Not measurable** — requires full P&L data |
-| Retention rate | **Not measured** — this is a single-session fake-door test with no tracked cohort or time series. See **12. Business / Financial Metrics** for a hypothetical, if-implemented projection built from this project's own real leading indicators. |
-| CLV / LTV | **Not measured** — same reason as retention rate above, which CLV is derived from. See **12. Business / Financial Metrics** for the hypothetical treatment. |
+| Retention rate | **Not measured** — this is a single-session fake-door test with no tracked cohort or time series. See **12. Marketing Metrics** for a hypothetical, if-implemented projection built from this project's own real leading indicators. |
+| CLV / LTV | **Not measured** — same reason as retention rate above, which CLV is derived from. See **12. Marketing Metrics** for the hypothetical treatment. |
 """.format(
         noticed=R["solution_validation"]["noticed_row"]["pct"], noticed_n=R["solution_validation"]["noticed_row"]["n"], noticed_d=R["solution_validation"]["noticed_row"]["d"],
         top_box=R["solution_validation"]["likelihood_use_next"]["pct_top_box_8plus"], tb_n=R["solution_validation"]["likelihood_use_next"]["n_top_box_8plus"], tb_d=R["solution_validation"]["likelihood_use_next"]["d"],
