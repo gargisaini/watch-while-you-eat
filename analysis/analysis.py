@@ -84,6 +84,37 @@ for c in post_raw.columns:
 
 post = post_raw.rename(columns=POST_COLS)[list(dict.fromkeys(POST_COLS.values()))].copy()
 
+# ---------------------------------------------------- gated-item correction
+# taste_match (post_q3) and guardrail_already_seen (post_q7) are gated in the live
+# survey — showIf: (e) => e.clickedFeature — src/lib/survey.ts:216,250 in the
+# prototype repo. Only 5 of 37 post respondents were ever shown them; the other 32
+# should read NOT_ASKED, not a real answer. 'pre and post final.xlsx' has all 37
+# rows filled for both columns — verified by a full column diff against the
+# prototype repo's corrected export (Market_Validation/'pre and post - post.csv'):
+# every other post column matches row-for-row; only these two differ, on exactly
+# the same 32 session_ids. The xlsx predates that correction; this restores it
+# without hand-editing the spreadsheet, so the pipeline stays reproducible from
+# a single documented source. The 5 true answers, by session_id (source: the
+# prototype repo's own gate-corrected export):
+_TASTE_MATCH_TRUE = {
+    "e0d7f8c0-b6ff-4152-9ed7-4145146c057f": "3",
+    "1c9cffec-6ca5-478f-9979-0d7d4b422add": "5",
+    "372a9eb4-d7fb-4707-9610-9105adbaa016": "3",
+    "6a75df52-3f9b-45df-a552-25e274202da0": "4",
+    "aa6feaa1-a681-40fa-824f-a3fe9445cc01": "3",
+}
+_GUARDRAIL_TRUE = {
+    "e0d7f8c0-b6ff-4152-9ed7-4145146c057f": "A mix",
+    "1c9cffec-6ca5-478f-9979-0d7d4b422add": "Mostly things I'd want",
+    "372a9eb4-d7fb-4707-9610-9105adbaa016": "A mix",
+    "6a75df52-3f9b-45df-a552-25e274202da0": "A mix",
+    "aa6feaa1-a681-40fa-824f-a3fe9445cc01": "A mix",
+}
+post["taste_match"] = post["session_id"].map(_TASTE_MATCH_TRUE).fillna("NOT_ASKED")
+post["guardrail_already_seen"] = post["session_id"].map(_GUARDRAIL_TRUE).fillna("NOT_ASKED")
+assert (post["taste_match"] != "NOT_ASKED").sum() == 5, "gated taste_match correction drifted"
+assert (post["guardrail_already_seen"] != "NOT_ASKED").sum() == 5, "gated guardrail correction drifted"
+
 # ------------------------------------------------------------- data QA ----
 qa = {}
 qa["pre_rows_total"] = int(len(pre))
@@ -222,10 +253,12 @@ reduced = post["reduced_struggle"].isin(["Yes, clearly", "Somewhat"])
 reduced_clearly = post["reduced_struggle"].isin(["Yes, clearly"])
 stay_dist = counts(post["stay_on_netflix"])
 stay = post["stay_on_netflix"].isin(["Yes", "Maybe"])
-guardrail_dist = counts(post["guardrail_already_seen"])
+guardrail_dist = counts(post.loc[post["guardrail_already_seen"] != "NOT_ASKED", "guardrail_already_seen"])
 lik = post["likelihood_use_next"].astype(float)
 top_box_lik = lik >= 8
-taste = post["taste_match"].astype(float)
+taste_answered = post.loc[post["taste_match"] != "NOT_ASKED", "taste_match"].astype(float)
+n_taste_not_asked = int((post["taste_match"] == "NOT_ASKED").sum())
+n_guardrail_not_asked = int((post["guardrail_already_seen"] == "NOT_ASKED").sum())
 
 results["solution_validation"] = {
     "noticed_row": {"n": int(noticed.sum()), "d": N_POST, "pct": pct(noticed.sum(), N_POST),
@@ -242,10 +275,15 @@ results["solution_validation"] = {
                           "pct_reduced_clearly": pct(reduced_clearly.sum(), N_POST)},
     "stay_on_netflix": {"distribution": stay_dist, "n_stay": int(stay.sum()), "d": N_POST,
                          "pct_stay": pct(stay.sum(), N_POST)},
-    "taste_match": {"mean": round(taste.mean(), 2), "median": float(taste.median()),
-                     "std": round(taste.std(), 2), "distribution": counts(post["taste_match"].astype(int)),
-                     "note": "Range 3-5 in current export; not a degenerate/default-value column."},
-    "guardrail_already_seen": {"distribution": guardrail_dist, "d": N_POST,
+    "taste_match": {"mean": round(taste_answered.mean(), 2), "median": float(taste_answered.median()),
+                     "std": round(taste_answered.std(), 2), "distribution": counts(taste_answered.astype(int)),
+                     "d": len(taste_answered), "n_not_asked": n_taste_not_asked,
+                     "note": "Gated item (showIf: clickedFeature in the live survey) — only "
+                             f"{len(taste_answered)} of {N_POST} post respondents were ever shown it; "
+                             f"the other {n_taste_not_asked} are NOT_ASKED, not a real answer, and are excluded "
+                             "from these stats. Not in the spec's Q1-Q9 list."},
+    "guardrail_already_seen": {"distribution": guardrail_dist, "d": N_POST - n_guardrail_not_asked,
+                                "post_total": N_POST, "n_not_asked": n_guardrail_not_asked,
                                 "n_missing": int(post["guardrail_already_seen"].isna().sum())},
     "likelihood_use_next": {"mean": round(lik.mean(), 2), "median": float(lik.median()),
                              "distribution": counts(post["likelihood_use_next"].astype(int)),
@@ -271,12 +309,18 @@ for row in elig["devices"].dropna():
 results["C1_occasion"]["device_counts"] = dev_counts
 
 # ------------------------------------------------------- guardrail deep dive
+# Gated item (showIf: clickedFeature) — see the gated-item correction above the load
+# step. valid_responses_n is the true n=5 who were ever shown this question; the
+# other 32 of 37 post respondents never saw it and are reported as NOT_ASKED, not
+# folded into either answer option.
 gr = post["guardrail_already_seen"]
+gr_answered = gr[gr != "NOT_ASKED"]
 results["guardrail"] = {
-    "valid_responses_n": int(gr.notna().sum()),
+    "valid_responses_n": int(len(gr_answered)),
+    "not_asked_n": int((gr == "NOT_ASKED").sum()),
     "missing_n": int(gr.isna().sum()),
     "d": N_POST,
-    "distribution": counts(gr),
+    "distribution": counts(gr_answered),
     "already_skip_option_present_in_data": bool(gr.isin(["Mostly things I'd already skip",
                                                           "Mostly already-seen"]).any()),
 }

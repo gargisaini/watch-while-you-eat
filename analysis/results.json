@@ -144,8 +144,8 @@
     "distribution": {
       "8": 10,
       "10": 9,
-      "7": 8,
       "6": 8,
+      "7": 8,
       "5": 6,
       "0": 5,
       "1": 5,
@@ -216,22 +216,26 @@
       "pct_stay": 86.5
     },
     "taste_match": {
-      "mean": 4.14,
-      "median": 4.0,
+      "mean": 3.6,
+      "median": 3.0,
       "std": 0.89,
       "distribution": {
-        "5": 17,
-        "3": 12,
-        "4": 8
+        "3": 3,
+        "5": 1,
+        "4": 1
       },
-      "note": "Range 3-5 in current export; not a degenerate/default-value column."
+      "d": 5,
+      "n_not_asked": 32,
+      "note": "Gated item (showIf: clickedFeature in the live survey) \u2014 only 5 of 37 post respondents were ever shown it; the other 32 are NOT_ASKED, not a real answer, and are excluded from these stats. Not in the spec's Q1-Q9 list."
     },
     "guardrail_already_seen": {
       "distribution": {
-        "Mostly things I'd want": 24,
-        "A mix": 13
+        "A mix": 4,
+        "Mostly things I'd want": 1
       },
-      "d": 37,
+      "d": 5,
+      "post_total": 37,
+      "n_not_asked": 32,
       "n_missing": 0
     },
     "likelihood_use_next": {
@@ -241,14 +245,14 @@
         "6": 7,
         "8": 6,
         "7": 5,
-        "10": 4,
         "5": 4,
-        "4": 3,
+        "10": 4,
         "3": 3,
+        "4": 3,
         "9": 2,
         "0": 1,
-        "1": 1,
-        "2": 1
+        "2": 1,
+        "1": 1
       },
       "n_top_box_8plus": 12,
       "d": 37,
@@ -271,12 +275,13 @@
     }
   },
   "guardrail": {
-    "valid_responses_n": 37,
+    "valid_responses_n": 5,
+    "not_asked_n": 32,
     "missing_n": 0,
     "d": 37,
     "distribution": {
-      "Mostly things I'd want": 24,
-      "A mix": 13
+      "A mix": 4,
+      "Mostly things I'd want": 1
     },
     "already_skip_option_present_in_data": false
   },
@@ -746,12 +751,12 @@
       "definition": "Share of post-prototype respondents who said the suggested episodes felt like content they'd already skip, rather than content they'd want.",
       "formula": "n(guardrail_already_seen == \"Mostly things I'd already skip\") / n(post respondents who answered this item)",
       "numerator": 0,
-      "denominator": 37,
+      "denominator": 5,
       "value_pct": 0.0,
-      "sample_size": 37,
+      "sample_size": 5,
       "source_question": "post \u2014 \"Of the episodes it suggested, did they feel like things you'd want, or things you'd already skip?\"",
-      "interpretation": "No respondent chose the 'would already skip' pole; the split is 'Mostly things I'd want' (24/37) vs 'A mix' (13/37). No kill-switch signal in the current data \u2014 recommendation relevance is not failing outright.",
-      "limitation": "This item has 0 missing values and real variance in the current export. Because a genuinely degenerate/default-only response pattern would invalidate this KPI, it should be re-checked against the live survey tool export (not just this snapshot) before being relied on for a go/no-go call."
+      "interpretation": "No respondent chose the 'would already skip' pole; the split is 'Mostly things I'd want' (1/5) vs 'A mix' (4/5). No kill-switch signal in the tiny sample that answered it \u2014 recommendation relevance is not failing outright, but n=5 cannot support a population claim either way.",
+      "limitation": "This item is gated in the live survey (shown only to respondents who clicked into the feature) \u2014 only 5/37 post respondents were ever asked it; the other 32 are NOT_ASKED, not a real answer folded into either option. n=5 is the true sample for this KPI, not the post-survey total."
     }
   },
   "spec_crosscheck": {
@@ -761,8 +766,8 @@
       "Spec's abandonment question (pre Q4) lists 5 options including 'Almost every time'; the export contains only 4 distinct values (Never / Once or twice / A few times / Often) \u2014 'Almost every time' received zero responses in this dataset, it is not a missing category.",
       "Spec's leak question (pre Q6) lists 6 options including 'Gave up and just ate'; the export contains only 5 distinct values \u2014 'Gave up and just ate' received zero responses.",
       "Spec's useful-components question (post Q6) lists a 'None' option; it does not appear in the export \u2014 every post respondent who answered selected at least one component as useful.",
-      "Spec's guardrail question (post Q5) options are 'Mostly want / A mix / Mostly already-seen or would-skip'; the export's two observed values ('Mostly things I'd want', 'A mix') match the spec's first two options, and zero respondents selected the failure option \u2014 consistent with the guardrail finding reported in Section 6 of the dashboard.",
-      "The post sheet contains one item \u2014 'How well did the episodes it showed you match your taste?' (taste_match, scale 3-5) \u2014 that does NOT appear in the official post-survey question list (Q1-Q9) in the spec doc. It is treated here as a supplementary, non-spec item and reported separately (Section 4 / Section 6 of the dashboard), not folded into any spec-defined KPI.",
+      "Spec's guardrail question (post Q5) options are 'Mostly want / A mix / Mostly already-seen or would-skip'; the export's two observed values ('Mostly things I'd want', 'A mix') match the spec's first two options, and zero respondents selected the failure option. This item is gated in the live survey (showIf: clickedFeature) \u2014 only 5 of 37 post respondents were ever shown it, not 37; the original xlsx export had all 37 rows filled, which was a data error corrected upstream of this pipeline (see the gated-item correction in analysis.py) \u2014 see Section 6 of the dashboard for the n=5 result.",
+      "The post sheet contains one item \u2014 'How well did the episodes it showed you match your taste?' (taste_match, scale 3-5) \u2014 that does NOT appear in the official post-survey question list (Q1-Q9) in the spec doc. It is also gated (showIf: clickedFeature), so it is n=5 of 37, not 37; it is treated here as a supplementary, non-spec item and reported separately (Section 4 / Section 6 of the dashboard), not folded into any spec-defined KPI.",
       "The spec's own measurement-plan section refers to the likelihood-to-use top-box KPI as 'post_q9' while also defining Q9 as an open-text confusion question and Q7 (a 0-10 slider) as 'magnitude of relief' \u2014 an internal inconsistency in the spec document's question numbering. This analysis mapped columns by matching each column's actual header text to the closest spec question rather than by position/number, and used the column literally titled 'How likely are you to use this at your next meal?' as the likelihood-to-use KPI.",
       "post 'stay_on_netflix' (leak-reversal) question: spec defines a single option 'No, I'd still switch'; the export splits this into two distinct values, 'No' (4 responses) and \"I'd still switch\" (1 response). Both are treated as non-retention for the Retention Intention KPI, consistent with either reading of the spec."
     ],

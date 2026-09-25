@@ -24,12 +24,16 @@ r["spec_crosscheck"] = {
         "— every post respondent who answered selected at least one component as useful.",
         "Spec's guardrail question (post Q5) options are 'Mostly want / A mix / Mostly already-seen or "
         "would-skip'; the export's two observed values ('Mostly things I'd want', 'A mix') match the spec's "
-        "first two options, and zero respondents selected the failure option — consistent with the guardrail "
-        "finding reported in Section 6 of the dashboard.",
+        "first two options, and zero respondents selected the failure option. This item is gated in the live "
+        "survey (showIf: clickedFeature) — only 5 of 37 post respondents were ever shown it, not 37; the "
+        "original xlsx export had all 37 rows filled, which was a data error corrected upstream of this "
+        "pipeline (see the gated-item correction in analysis.py) — see Section 6 of the dashboard for the "
+        "n=5 result.",
         "The post sheet contains one item — 'How well did the episodes it showed you match your taste?' "
         "(taste_match, scale 3-5) — that does NOT appear in the official post-survey question list (Q1-Q9) in "
-        "the spec doc. It is treated here as a supplementary, non-spec item and reported separately (Section 4 "
-        "/ Section 6 of the dashboard), not folded into any spec-defined KPI.",
+        "the spec doc. It is also gated (showIf: clickedFeature), so it is n=5 of 37, not 37; it is treated "
+        "here as a supplementary, non-spec item and reported separately (Section 4 / Section 6 of the "
+        "dashboard), not folded into any spec-defined KPI.",
         "The spec's own measurement-plan section refers to the likelihood-to-use top-box KPI as 'post_q9' "
         "while also defining Q9 as an open-text confusion question and Q7 (a 0-10 slider) as 'magnitude of "
         "relief' — an internal inconsistency in the spec document's question numbering. This analysis mapped "

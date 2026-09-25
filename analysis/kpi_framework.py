@@ -115,16 +115,22 @@ guardrail = {
     "value_pct": 0.0, "sample_size": r["guardrail"]["valid_responses_n"],
     "source_question": "post — \"Of the episodes it suggested, did they feel like things you'd want, or things you'd already skip?\"",
     "interpretation": "No respondent chose the 'would already skip' pole; the split is 'Mostly things I'd want' "
-                      "({}/{}) vs 'A mix' ({}/{}). No kill-switch signal in the current data — recommendation "
-                      "relevance is not failing outright.".format(
+                      "({}/{}) vs 'A mix' ({}/{}). No kill-switch signal in the tiny sample that answered it — "
+                      "recommendation relevance is not failing outright, but n={} cannot support a population "
+                      "claim either way.".format(
                           r["guardrail"]["distribution"].get("Mostly things I'd want", 0),
                           r["guardrail"]["valid_responses_n"],
                           r["guardrail"]["distribution"].get("A mix", 0),
                           r["guardrail"]["valid_responses_n"],
+                          r["guardrail"]["valid_responses_n"],
                       ),
-    "limitation": "This item has 0 missing values and real variance in the current export. Because a genuinely "
-                  "degenerate/default-only response pattern would invalidate this KPI, it should be re-checked against the "
-                  "live survey tool export (not just this snapshot) before being relied on for a go/no-go call.",
+    "limitation": "This item is gated in the live survey (shown only to respondents who clicked into the "
+                  "feature) — only {}/{} post respondents were ever asked it; the other {} are NOT_ASKED, not "
+                  "a real answer folded into either option. n={} is the true sample for this KPI, not the "
+                  "post-survey total.".format(
+                      r["guardrail"]["valid_responses_n"], r["guardrail"]["d"],
+                      r["guardrail"]["not_asked_n"], r["guardrail"]["valid_responses_n"],
+                  ),
 }
 
 r["kpi_framework"] = {"core_kpis": kpis, "guardrail_kpi": guardrail}

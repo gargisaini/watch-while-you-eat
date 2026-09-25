@@ -64,6 +64,91 @@ assert (round(C2P_FEAT_SESS, 1), round(C2P_ALL_SESS, 1)) == (71.4, 76.9), "sessi
 assert (round(C2P_FEAT_EVT, 1), round(C2P_ALL_EVT, 1)) == (54.5, 61.7), "event-grain c2p drifted"
 assert len(_B["dwell_ms"]) == 2, "dwell n changed — the 'insufficient' framing must be revisited"
 
+# ------------------------------------------ hypothetical business/financial
+# Section 12 only. Two layers: (1) real, sourced Netflix company financials
+# (SEC 10-K, Netflix's own investor letter) and this project's own real leading
+# indicators (adoption rate, reversal rate); (2) one unverifiable assumption —
+# how much of Netflix's baseline churn this specific friction causes — sized
+# proportionally to layer 1 rather than guessed independently. Every number
+# downstream of that one assumption is a hypothetical projection, not a
+# measurement, and is labelled as such everywhere it's shown.
+NETFLIX_BIZ = {
+    "fy2024_revenue": 39_000_966_000,       # SEC 10-K, real
+    "subs_q4_2024": 301_630_000,            # SEC 10-K/earnings release, last disclosed subscriber count
+    "net_adds_2024": 41_000_000,            # Netflix's own "record net additions (41M)" (2025 Perspective letter)
+    "operating_margin_fy2025": 0.295,       # SEC 10-K, real
+    "monthly_churn_baseline": 0.020,        # Antenna (third-party analytics firm), US-market estimate — NOT Netflix-disclosed
+    "discount_rate_assumed": 0.10,          # standard illustrative rate — NOT Netflix's actual cost of capital
+    "cac_anchor": 126,                      # Q3 2024, derived from Netflix's own disclosed marketing spend ÷ net adds
+                                             # (allyourscreens.com calc, not Netflix's own stated CAC). Last computable
+                                             # year — Netflix stopped disclosing subscriber counts in 2025. Was
+                                             # trending up (+31% 2022→2024), so likely understates current CAC.
+}
+_NB = NETFLIX_BIZ
+avg_subs_2024 = ((_NB["subs_q4_2024"] - _NB["net_adds_2024"]) + _NB["subs_q4_2024"]) / 2
+ARPU_MONTHLY = _NB["fy2024_revenue"] / avg_subs_2024 / 12
+MARGIN_PER_MEMBER_ANNUAL = ARPU_MONTHLY * 12 * _NB["operating_margin_fy2025"]
+
+RESOLUTION_LOW = ADOPTION / 100                       # 10.4%, real observed adoption rate (§9)
+RESOLUTION_HIGH = R["reversal_C4"]["n_would_stay"] / R["reversal_C4"]["n_denominator"]  # 17/19, real reversal rate (§5/§10)
+RESOLUTION_MID = (RESOLUTION_LOW * RESOLUTION_HIGH) ** 0.5
+
+CHURN_ANCHOR = 0.0005
+def churn_shift(resolution_rate):
+    return CHURN_ANCHOR * (resolution_rate / RESOLUTION_LOW)
+
+def clv(annual_rr, margin=MARGIN_PER_MEMBER_ANNUAL, discount=_NB["discount_rate_assumed"]):
+    return margin * (annual_rr / (1 + discount - annual_rr))
+
+BASELINE_MONTHLY_CHURN = _NB["monthly_churn_baseline"]
+BASELINE_ANNUAL_RR = (1 - BASELINE_MONTHLY_CHURN) ** 12
+BASELINE_CLV = clv(BASELINE_ANNUAL_RR)
+
+SCENARIOS = ["Low", "Mid", "High"]
+RESOLUTIONS = {"Low": RESOLUTION_LOW, "Mid": RESOLUTION_MID, "High": RESOLUTION_HIGH}
+BIZ_PROJECTIONS = {}
+for _name in SCENARIOS:
+    _shift = churn_shift(RESOLUTIONS[_name])
+    _new_monthly_churn = BASELINE_MONTHLY_CHURN - _shift
+    _new_annual_rr = (1 - _new_monthly_churn) ** 12
+    _extra_retained_per_month = _shift * _NB["subs_q4_2024"]
+    _c = clv(_new_annual_rr)
+    BIZ_PROJECTIONS[_name] = {
+        "new_monthly_churn": _new_monthly_churn * 100,
+        "churn_shift_pp": _shift * 10000 / 100,
+        "extra_retained_per_month": _extra_retained_per_month,
+        "revenue_retained_annual": _extra_retained_per_month * ARPU_MONTHLY * 12,
+        "clv": _c,
+        "clv_delta_pct": (_c - BASELINE_CLV) / BASELINE_CLV * 100,
+        "acquisition_cost_avoided_annual": _extra_retained_per_month * _NB["cac_anchor"] * 12,
+        "ltv_cac_ratio": _c / _NB["cac_anchor"],
+    }
+
+# Pinned to this formula's own full-precision output (never rounding mid-calculation) —
+# not hand-typed targets, so a future edit to NETFLIX_BIZ or the resolution rates fails
+# loudly here instead of silently drifting from the narrative text below.
+assert round(ARPU_MONTHLY, 2) == 11.56, "ARPU derivation drifted"
+assert round(MARGIN_PER_MEMBER_ANNUAL, 2) == 40.93, "margin/member drifted"
+assert round(BASELINE_CLV, 2) == 101.86, "baseline CLV drifted"
+assert round(BIZ_PROJECTIONS["Low"]["clv"], 2) == 104.08, "Low CLV drifted"
+assert round(BIZ_PROJECTIONS["Mid"]["clv"], 2) == 108.58, "Mid CLV drifted"
+assert round(BIZ_PROJECTIONS["High"]["clv"], 2) == 123.89, "High CLV drifted"
+assert round(BIZ_PROJECTIONS["Low"]["new_monthly_churn"], 2) == 1.95, "Low churn % drifted"
+assert round(BIZ_PROJECTIONS["Mid"]["new_monthly_churn"], 2) == 1.85, "Mid churn % drifted"
+assert round(BIZ_PROJECTIONS["High"]["new_monthly_churn"], 2) == 1.57, "High churn % drifted"
+assert round(BIZ_PROJECTIONS["Low"]["ltv_cac_ratio"], 2) == 0.83, "Low LTV:CAC drifted"
+assert round(BIZ_PROJECTIONS["Mid"]["ltv_cac_ratio"], 2) == 0.86, "Mid LTV:CAC drifted"
+assert round(BIZ_PROJECTIONS["High"]["ltv_cac_ratio"], 2) == 0.98, "High LTV:CAC drifted"
+
+# Shared card layout for §9 and §12 — one flowing narrative paragraph, no sub-labels.
+def measured_kpi(name, value, delta, definition, calculation):
+    c1, c2 = st.columns([1, 3])
+    c1.metric(name, value, delta)
+    with c2:
+        st.markdown(definition)
+        st.markdown(calculation)
+    st.markdown("---")
+
 # ---------------------------------------------------------------- theme ----
 BG = "#141414"
 CARD = "#1F1F1F"
@@ -144,7 +229,7 @@ SECTIONS = [
     "1. Business Problem", "2. Sample / Recruitment Funnel", "3. Problem Validation",
     "4. Solution Validation", "5. Before vs After", "6. Guardrail",
     "7. Feature Component Analysis", "8. Segment Analysis", "9. KPI Scorecard",
-    "10. Key Insights", "11. Recommendations", "12. KPI (archived)",
+    "10. Key Insights", "11. Recommendations", "12. Business / Financial Metrics", "13. KPI (archived)",
 ]
 page = st.sidebar.radio("Section", SECTIONS, label_visibility="collapsed")
 st.sidebar.markdown("---")
@@ -323,7 +408,8 @@ elif page.startswith("4."):
              title=f"Likelihood to use at next meal, 0-10 (mean {sv['likelihood_use_next']['mean']})", suffix="")
 
     _wanted_n = sv["guardrail_already_seen"]["distribution"].get("Mostly things I'd want", 0)
-    st.info(f"**Recommendation relevance**: {_wanted_n} "
+    st.info(f"**Recommendation relevance** (gated item, n={sv['guardrail_already_seen']['d']} of "
+            f"{sv['guardrail_already_seen']['post_total']} post respondents ever asked): {_wanted_n} "
             f"of {sv['guardrail_already_seen']['d']} said suggestions were mostly things they'd want; the rest said "
             "'a mix'. See Section 6 for the full guardrail analysis.", icon="🎯")
     st.warning(
@@ -391,29 +477,43 @@ elif page.startswith("6."):
     section_header("Guardrail — Recommendation Quality / Already-Seen Check")
     g = R["guardrail"]
     sv_taste = R["solution_validation"]["taste_match"]
+    st.warning(
+        f"**This item is gated, not answered by the full post sample.** The live survey only shows this "
+        f"question to respondents who clicked into the feature (`showIf: clickedFeature`). "
+        f"**{g['not_asked_n']} of {g['d']} post respondents were never asked it** — the true sample is "
+        f"**n={g['valid_responses_n']}**, not {g['d']}. An earlier export of this spreadsheet had all "
+        f"{g['d']} rows filled in for this column, which was a data error; it has been corrected upstream of "
+        "this dashboard (see `analysis/analysis.py`'s gated-item correction) using the prototype repo's own "
+        "gate-corrected export, matched by session_id.", icon="⚠️")
+
     c1, c2, c3 = st.columns(3)
-    c1.metric("Valid responses", f"{g['valid_responses_n']}/{g['d']}")
-    c2.metric("Missing / not shown", g["missing_n"])
-    c3.metric("'Would already skip' selected", "0")
+    c1.metric("Asked this question", f"{g['valid_responses_n']}/{g['d']}")
+    c2.metric("Not asked (gated)", g["not_asked_n"])
+    c3.metric("'Would already skip' selected", f"0/{g['valid_responses_n']}")
 
     order = ["A mix", "Mostly things I'd want"]
     hbar(order, [g["distribution"].get(k, 0) for k in order], highlight_labels=["Mostly things I'd want"],
-         title=f"Did suggestions feel wanted or already-skippable? (n={g['d']})", suffix="")
+         title=f"Did suggestions feel wanted or already-skippable? (n={g['valid_responses_n']} of "
+               f"{g['d']} asked)", suffix="")
 
-    if g["missing_n"] == 0 and g["already_skip_option_present_in_data"] is False:
-        st.success(
-            "**No contamination detected in the current export.** All 37 post respondents answered this item "
-            "(0 missing), and no respondent selected an 'already-skip' option — responses split between "
-            "'Mostly things I'd want' and 'A mix'. This is a real, non-degenerate measurement in the current data.",
-            icon="✅")
+    if g["already_skip_option_present_in_data"] is False:
+        st.info(
+            f"**No kill-switch signal in the n={g['valid_responses_n']} who answered.** Of the "
+            f"{g['valid_responses_n']} respondents actually shown this question, none selected the "
+            "'would already skip' option — responses split 4 'A mix' to 1 'Mostly things I'd want'. That is "
+            f"a real, non-degenerate result, but n={g['valid_responses_n']} is far too small to support a "
+            "population-level claim about recommendation quality in either direction.", icon="ℹ️")
 
     st.markdown("### Cross-check: the related 'taste match' item")
+    st.caption(f"Also gated — {sv_taste['n_not_asked']} of {R['n_post']} post respondents were never asked "
+               f"this either; n={sv_taste['d']} answered.")
     st.write(f"Mean {sv_taste['mean']}/5, median {sv_taste['median']}, std {sv_taste['std']}, "
-             f"distribution: {sv_taste['distribution']}")
+             f"distribution (n={sv_taste['d']}): {sv_taste['distribution']}")
     st.info(
-        f"The taste-match item has real spread (std {sv_taste['std']}, range 3–5) and the guardrail item has "
-        f"0 missing values across all {g['d']} post respondents — both are usable, non-degenerate measurements "
-        "in the current data.", icon="ℹ️")
+        f"At n={sv_taste['d']}, the taste-match item has some spread (std {sv_taste['std']}, range 3–5) and "
+        f"the guardrail item has no missing values among the {g['valid_responses_n']} who were actually asked "
+        "— both are usable, non-degenerate measurements, but both describe a handful of respondents, not the "
+        "post-survey population.", icon="ℹ️")
 
 # ============================================================ SECTION 7 ===
 elif page.startswith("7."):
@@ -467,109 +567,64 @@ elif page.startswith("9."):
     st.caption("Measured from the live fake-door prototype's event log (960 events, 94 sessions, export "
                "2026-09-18) — not from the survey. These are observed behaviour, not stated intention. "
                "The survey-response KPIs and the requested-marketing-metric tables now live in "
-               "**12. KPI (archived)**.")
-
-    def measured_kpi(name, value, delta, narrative):
-        c1, c2 = st.columns([1, 3])
-        c1.metric(name, value, delta)
-        with c2:
-            st.markdown(narrative)
-        st.markdown("---")
+               "**13. KPI (archived)**. A hypothetical, if-implemented business/financial projection built "
+               "from these behavioural KPIs is in **12. Business / Financial Metrics**.")
 
     measured_kpi(
         "Relative CTR Uplift", f"{CTR_UPLIFT:.2f}×", "threshold ≥1.5× · clears",
-        "Click-through rate (CTR) is the standard measure of how often people click something they're shown — "
-        "clicks divided by impressions — and on its own it doesn't say much, because some rows get more clicks "
-        "just from being familiar or well-positioned, not because people prefer what's in them. Relative CTR "
-        "uplift solves that by comparing the feature row's CTR against the average CTR of the app's other, "
-        "generic rows within the same sessions, which isolates whether people are clicking this specific row "
-        "because of what it is, rather than just because it's in front of them. That distinction matters here "
-        "specifically because the whole premise of \"Watch While You Eat\" is that people want a faster way to "
-        "decide, not just another row to browse — a high uplift is evidence of that specific preference, not "
-        f"general clickiness. For this feature, that comparison came out to a feature-row CTR of {CTR_FEAT:.3f}% "
-        f"({_B['feature_clicks']} clicks across {_B['feature_impr']:,} impressions) against a generic-row "
-        f"baseline of {CTR_GEN:.3f}% ({_B['generic_clicks']} clicks across {_B['generic_impr']:,} impressions) "
-        f"— a relative uplift of {CTR_UPLIFT:.2f}×, using the `payload.count` impression convention (a second "
-        "convention, counting raw impression events, gives a different absolute CTR but the same uplift "
-        "direction; the convention has to be stated because the two disagree substantially in absolute terms). "
-        f"That {CTR_UPLIFT:.2f}× clears the project's own pre-registered viability threshold of 1.5×, making "
-        "this the centrepiece metric from the methodology doc and the only one of the five behavioural KPIs "
-        f"here that clearly favours the feature. It's worth remembering, though, that {_B['feature_clicks']} "
-        "total feature clicks is a genuinely thin absolute base — a ratio can look strong while still resting "
-        "on very few real events, and one or two additional or missing clicks would move this number "
-        "meaningfully.")
+        "**What it measures.** CTR (clicks ÷ impressions) shows how often people click something shown to "
+        "them — but a row can get more clicks just from being familiar, not preferred. Relative uplift "
+        "compares the feature row's CTR against the app's average generic-row CTR within the same sessions, "
+        "isolating genuine preference for this specific row from general clickiness.",
+        f"**The numbers.** Feature CTR {CTR_FEAT:.3f}% ({_B['feature_clicks']} clicks/{_B['feature_impr']:,} "
+        f"impressions) vs. generic {CTR_GEN:.3f}% ({_B['generic_clicks']}/{_B['generic_impr']:,}) = "
+        f"{CTR_UPLIFT:.2f}×, clearing the project's 1.5× threshold (`payload.count` convention — a second "
+        f"convention gives a different absolute CTR but the same direction). {_B['feature_clicks']} total "
+        "clicks is a thin base; one or two more would move this meaningfully.")
 
     measured_kpi(
         "Content-to-Play (feature)", f"{C2P_FEAT_SESS:.1f}%", f"session grain · event grain {C2P_FEAT_EVT:.1f}%",
-        "Content-to-play conversion measures the very last step of the decision funnel: of the people who got "
-        "far enough to open a specific title, how many actually pressed play, rather than backing out and going "
-        "somewhere else. It's a natural complement to CTR — CTR tells you whether people are drawn to click "
-        "into the feature at all, while this tells you whether, once they're looking at something it suggested, "
-        "they actually follow through. Because sessions and individual open-then-play events aren't the same "
-        "unit, this has to be measured at a consistent grain to mean anything: at the session level, "
-        f"{_B['c2p_feat_sess_num']} of the {_B['c2p_feat_sess_den']} sessions that opened a title from the "
-        f"feature row went on to press play, a {C2P_FEAT_SESS:.1f}% conversion, against an app-wide "
-        f"session-level rate of {C2P_ALL_SESS:.1f}% ({_B['c2p_all_sess_num']} of {_B['c2p_all_sess_den']}); at "
-        f"the event level, {_B['c2p_feat_evt_num']} of {_B['c2p_feat_evt_den']} feature title-opens converted "
-        f"to a play ({C2P_FEAT_EVT:.1f}%), against an app-wide event-level rate of {C2P_ALL_EVT:.1f}% "
-        f"({_B['c2p_all_evt_num']} of {_B['c2p_all_evt_den']}). Whichever grain is used, the two numbers being "
-        "compared have to be from the same grain — comparing a session-level feature figure against an "
-        "event-level app-wide figure would be comparing two different things. At both grains, the feature "
-        "actually trails the app-wide rate by five to seven points, which is the opposite direction from the "
-        "CTR finding above, and the first real behavioural signal in this project that points against the "
-        "feature rather than just falling short of a threshold. A large part of why this number is worth "
-        f"treating cautiously: {_B['top_title_opens']} of the {_B['c2p_feat_evt_den']} feature title-opens, and "
-        f"{_B['top_title_plays']} of the {_B['feature_plays']} plays, are all the same single title (Breaking "
-        "Bad S5E13) — meaning a meaningful share of what looks like \"feature conversion\" is really describing "
-        "how one tile performed in a very small prototype catalogue, not the feature mechanic in general.")
+        "**What it measures.** The funnel's last step — of people who opened a title from the feature row, "
+        "how many actually pressed play. Complements CTR, which only shows whether people click in at all, "
+        "not whether they follow through.",
+        f"**The numbers.** Session grain: {_B['c2p_feat_sess_num']}/{_B['c2p_feat_sess_den']} = "
+        f"{C2P_FEAT_SESS:.1f}% (feature) vs. {_B['c2p_all_sess_num']}/{_B['c2p_all_sess_den']} = "
+        f"{C2P_ALL_SESS:.1f}% (app-wide). Event grain: {_B['c2p_feat_evt_num']}/{_B['c2p_feat_evt_den']} = "
+        f"{C2P_FEAT_EVT:.1f}% vs. {_B['c2p_all_evt_num']}/{_B['c2p_all_evt_den']} = {C2P_ALL_EVT:.1f}% — "
+        "compare same-grain only. At both grains the feature trails baseline, the opposite direction from "
+        f"CTR, and {_B['top_title_opens']} of {_B['c2p_feat_evt_den']} feature title-opens are a single title "
+        "(Breaking Bad S5E13) — a meaningful share of this is one tile's performance, not the mechanic "
+        "generally.")
 
     measured_kpi(
         "Feature Adoption Rate", f"{ADOPTION:.1f}%",
         f"n={_B['adoption_num']}/{_B['adoption_den']} · threshold ≥30% · FAILS",
-        "Feature adoption rate answers a different question than CTR does: not whether people click the row "
-        "when it's in front of them, but whether they engage with it at all across a typical session — the "
-        "standard distinction growth and product teams draw between exposure-driven interest and something "
-        "people actually pick up as part of how they use the product. It's calculated as the share of sessions "
-        "that reached the home screen (where the feature could be seen) that also included at least one click "
-        f"on the feature row: {_B['adoption_num']} of {_B['adoption_den']} such sessions, or {ADOPTION:.1f}%. "
-        "Unlike CTR, this metric has an explicit target attached to it in the project's own pre-registered "
-        "measurement plan — a threshold of 30% adoption was set before data collection began, specifically so "
-        f"the go/no-go decision wouldn't be made by eyeballing a number after the fact. At {ADOPTION:.1f}%, "
-        "this result falls well short of that bar, and because the threshold was fixed in advance, that's a "
-        "real signal rather than something to explain away: whatever is driving CTR up isn't yet translating "
-        "into the kind of routine engagement the feature would need to matter at scale.")
+        "**What it measures.** Distinct from CTR — whether people engage with the feature at all during a "
+        "session, not just whether they click it when shown. The standard split between curiosity and actual "
+        "pickup.",
+        f"**The numbers.** {_B['adoption_num']} of {_B['adoption_den']} sessions reaching home clicked the "
+        f"feature = {ADOPTION:.1f}%, against a 30% threshold set before data collection began. Falls well "
+        "short — a real signal, not something to explain away.")
 
     measured_kpi(
         "Feature Dwell Time", f"n={len(_B['dwell_ms'])}", "insufficient",
-        "Dwell time is the standard way products measure whether something holds someone's attention once "
-        "they've engaged with it, rather than just getting a passing glance — here, how long someone spends "
-        "with the feature after clicking into it. The project's pre-registered threshold, a median of at least "
-        "20 seconds, exists specifically to filter out curiosity clicks that don't turn into real engagement "
-        "from ones that do. The problem with reporting this metric right now isn't the threshold, it's the "
-        "sample behind it: across the entire fake-door test, exactly two dwell events were ever recorded "
-        f"({_B['dwell_ms'][0]:,}ms and {_B['dwell_ms'][1]:,}ms). Two data points cannot support a median, a "
-        "distribution, or any claim about typical behaviour — this isn't a metric that fell short of its "
-        "target, it's a metric that doesn't yet have enough data to be evaluated at all, and it should never "
-        "be shown as a clean percentage or a pass/fail result without that distinction being obvious.")
+        "**What it measures.** Whether the feature holds attention once clicked into, not just whether it's "
+        "opened. The ≥20s median threshold exists to filter curiosity clicks from real engagement.",
+        f"**The numbers.** Only {len(_B['dwell_ms'])} dwell events were ever recorded "
+        f"({_B['dwell_ms'][0]:,}ms, {_B['dwell_ms'][1]:,}ms). Two points can't support a median or any claim "
+        "about typical behaviour — this isn't a result that missed its target, it's one without enough data "
+        "to evaluate at all.")
 
     measured_kpi(
         "Take Rate", f"{TAKE_RATE:.3f}%",
         f"n={_B['feature_plays']} plays · alt convention {TAKE_RATE_ALT:.2f}%",
-        "Take rate is the metric Netflix itself uses internally to separate a row that gets clicked from one "
-        "that actually delivers value — of everyone who saw the feature row, what share went all the way "
-        "through to pressing play on something from it, not just opening or browsing it. Conceptually, it's "
-        "the highest-ceiling metric on this list, because it's the one closest to the actual outcome the "
-        "feature is meant to produce. Calculated the same way as CTR (feature plays divided by feature "
-        "impressions, using the same `payload.count` convention so the two numbers are comparable), it comes "
-        f"out to {_B['feature_plays']} plays across {_B['feature_impr']:,} impressions, or {TAKE_RATE:.3f}% — a "
-        "second impression convention, counting raw impression events instead, gives "
-        f"{TAKE_RATE_ALT:.2f}% for the same {_B['feature_plays']} plays, which is why the convention has to "
-        "travel with the number whenever it's cited. The number that actually matters here, though, is the "
-        f"{_B['feature_plays']}: that's {_B['feature_plays']} plays from {_B['feature_play_sessions']} distinct "
-        "sessions, the thinnest base of any metric in this scorecard. A single additional play would move the "
-        "percentage by roughly 17% of its own value, which is why the raw count belongs in front of the "
-        "percentage rather than the other way around — this is a headcount that happens to be expressed as a "
-        "ratio, not a stable statistical result.")
+        "**What it measures.** Netflix's own internal metric for separating a clicked row from one that "
+        "delivers real value — of everyone shown the row, what share actually pressed play.",
+        f"**The numbers.** {_B['feature_plays']} plays ÷ {_B['feature_impr']:,} impressions = "
+        f"{TAKE_RATE:.3f}% (`payload.count` convention; the `row_impression`-event convention gives "
+        f"{TAKE_RATE_ALT:.2f}% for the same {_B['feature_plays']} plays — state the convention). The "
+        f"{_B['feature_plays']} matters more than the percentage: from {_B['feature_play_sessions']} sessions, "
+        "the thinnest base on this page — one more play moves it ~17%. Report the count first.")
 
 # ============================================================ SECTION 10 ==
 elif page.startswith("10."):
@@ -634,17 +689,125 @@ elif page.startswith("11."):
 """)
     st.markdown("#### TEST NEXT")
     st.markdown(f"""
-- **Instrument the real feature** with an event log (impression, click, dwell, play-start) — the decisive behavioural
-  KPIs (CTR, take rate, decision latency, funnel conversion, cannibalisation) cannot be computed from survey data alone.
+- **Grow the behavioural sample.** The real fake-door prototype is already instrumented with an event log
+  (impression, click, dwell, play-start) and five behavioural KPIs are already measured from it — CTR uplift,
+  content-to-play, adoption, dwell, take rate (Section 9). The gap now is sample size, not instrumentation:
+  11 feature clicks, 6 plays, and 2 dwell events are too thin to trust at face value. Decision latency, full
+  funnel conversion (impression → click → play-start → watch-complete), and cannibalisation still have no
+  event support at all and remain genuinely uninstrumented (Section 13).
 - **A/B or holdout test** to measure actual retention lift, rather than the stated-intention proxies used here — this
-  study has no control cohort and no time series.
-- **Re-run the guardrail and taste-match items** against a live export to confirm they hold up before treating
-  recommendation quality as settled (Section 6).
+  study has no control cohort and no time series. Section 12 shows what a projected retention/CLV impact could
+  look like from the leading indicators already measured, explicitly labelled as hypothetical, not observed.
+- **Re-collect the guardrail and taste-match items at scale.** Both are gated to respondents who click into the
+  feature, and only 5 of 37 post respondents ever did — the 4-mix/1-wanted split is a real result on a real
+  n=5, not a placeholder, but n=5 cannot settle a recommendation-quality question either way (Section 6).
 - **Targeted test with the "have to figure it out" segment** specifically, since demand concentrates there.
 """)
 
 # ============================================================ SECTION 12 ==
 elif page.startswith("12."):
+    section_header("Business / Financial Metrics")
+    st.markdown("Connects the survey and behavioral evidence to what this looks like in Netflix's own business "
+                 "terms — grounded where the project's own data allows, modeled where it doesn't, explicit "
+                 "about which is which throughout.")
+    st.warning(
+        "The four metrics below are a hypothetical analysis, not a measured result: what these business "
+        "metrics could look like if Netflix implemented this feature at scale, modeled from the project's own "
+        "real leading indicators. Netflix has not implemented this feature — nothing here is an observed "
+        "outcome.", icon="⚠️")
+
+    st.markdown(f"""
+| Metric | Value | Detailed in |
+|---|---|---|
+| Off-Platform Leak Rate | {R['C4_leak']['pct_off_platform']}% ({R['C4_leak']['n_off_platform']}/{R['C4_leak']['d']}) | §3 |
+| Leak-Cohort Reversal Rate | {R['reversal_C4']['pct_would_stay']}% ({R['reversal_C4']['n_would_stay']}/{R['reversal_C4']['n_denominator']}) | §5 |
+| Stated Retention Intent | {R['solution_validation']['stay_on_netflix']['pct_stay']}% ({R['solution_validation']['stay_on_netflix']['n_stay']}/{R['solution_validation']['stay_on_netflix']['d']}) | §4 |
+| Feature Awareness | {R['solution_validation']['noticed_row']['pct']}% ({R['solution_validation']['noticed_row']['n']}/{R['solution_validation']['noticed_row']['d']}) | §4 |
+""")
+
+    measured_kpi(
+        "Retention Rate",
+        f"{BIZ_PROJECTIONS['Low']['new_monthly_churn']:.2f}–{BIZ_PROJECTIONS['High']['new_monthly_churn']:.2f}% churn",
+        f"vs {BASELINE_MONTHLY_CHURN*100:.1f}% baseline · modeled",
+        "**What it measures.** If Netflix implemented this feature at scale, here's what it would "
+        "hypothetically mean for retention rate — the standard subscription-business metric for how many "
+        "customers a company keeps over a given period, and exactly the metric this project's problem "
+        "statement is really about, since the feature exists because unresolved mealtime decision friction "
+        "plausibly drives people to leave the platform. It can't be measured directly from this project — "
+        "that would require a tracked cohort over real time, not a survey or a short fake-door test.",
+        "**The numbers.** This is a hypothetical projection built from two layers. The first is grounded in "
+        f"what was actually measured: the share whose behavior would realistically change ranges from "
+        f"{RESOLUTION_LOW*100:.1f}% (the real, observed adoption rate) at the low end to "
+        f"{RESOLUTION_HIGH*100:.1f}% (the stated reversal rate among the matched cohort) at the high end, "
+        f"with {RESOLUTION_MID*100:.1f}% as a middle estimate. The second layer is the one piece this "
+        "project's data genuinely can't supply — what fraction of monthly cancellations this specific "
+        f"friction actually causes — sized proportionally to the first layer's range, anchored at a "
+        f"conservative {CHURN_ANCHOR*100:.2f} percentage points for the low case. That gives a hypothetical "
+        f"monthly churn shift from a {BASELINE_MONTHLY_CHURN*100:.1f}% baseline down to "
+        f"{BIZ_PROJECTIONS['Low']['new_monthly_churn']:.2f}% (low), {BIZ_PROJECTIONS['Mid']['new_monthly_churn']:.2f}% "
+        f"(mid), or {BIZ_PROJECTIONS['High']['new_monthly_churn']:.2f}% (high) — the range is grounded in real "
+        "behavior and real stated intent, but the size of the effect still rests on one assumption this "
+        "project has no way to verify.")
+
+    measured_kpi(
+        "CLV / LTV", f"${BIZ_PROJECTIONS['Low']['clv']:.0f}–${BIZ_PROJECTIONS['High']['clv']:.0f}",
+        f"baseline ${BASELINE_CLV:.2f} · modeled",
+        "**What it measures.** Following that same hypothetical — if Netflix implemented this feature and "
+        "retention shifted by the amounts above — customer lifetime value (CLV), the standard formula for "
+        "turning a retention rate into a single dollar figure representing a customer's full worth over their "
+        "relationship with a company, would move with it.",
+        f"**The numbers.** Using Netflix's real FY2025 operating margin "
+        f"({_NB['operating_margin_fy2025']*100:.1f}%, from their SEC filing) applied to the derived monthly "
+        "revenue per member, and running the same three retention scenarios through the standard CLV formula, "
+        f"gives a baseline of ${BASELINE_CLV:.2f}, rising to ${BIZ_PROJECTIONS['Low']['clv']:.2f} "
+        f"(+{BIZ_PROJECTIONS['Low']['clv_delta_pct']:.1f}%) in the low scenario, "
+        f"${BIZ_PROJECTIONS['Mid']['clv']:.2f} (+{BIZ_PROJECTIONS['Mid']['clv_delta_pct']:.1f}%) in the mid "
+        f"scenario, and ${BIZ_PROJECTIONS['High']['clv']:.2f} (+{BIZ_PROJECTIONS['High']['clv_delta_pct']:.1f}%) "
+        "in the high. The margin figure is real, sourced data; the formula also needs a discount rate, and "
+        f"{_NB['discount_rate_assumed']*100:.0f}% was used as a standard illustrative rate rather than "
+        "anything specific to Netflix's actual cost of capital — so this shows that CLV is genuinely sensitive "
+        "to the kind of retention shift being hypothesized, not that this feature would actually produce it.")
+
+    measured_kpi(
+        "Acquisition Cost Avoided",
+        f"${BIZ_PROJECTIONS['Low']['acquisition_cost_avoided_annual']/1e6:.0f}M–"
+        f"${BIZ_PROJECTIONS['High']['acquisition_cost_avoided_annual']/1e9:.2f}B/yr",
+        "modeled",
+        "**What it measures.** Continuing the same hypothetical, and drawing on the well-known subscription "
+        "principle that retaining a customer costs far less than acquiring a new one — quantified here rather "
+        "than left as a line of reasoning. If the retention shift above held, how much marketing spend would "
+        "Netflix avoid by not needing to acquire that many new subscribers to replace the ones who'd otherwise "
+        "have churned?",
+        f"**The numbers.** Using the same three scenarios and a cost-per-new-subscriber estimate of "
+        f"${_NB['cac_anchor']} — calculated from Netflix's own disclosed marketing expense divided by their "
+        "own disclosed net subscriber adds in Q3 2024, the last quarter this is even computable since Netflix "
+        "stopped reporting subscriber counts in 2025 — the hypothetical annualized avoided cost comes out to "
+        f"roughly ${BIZ_PROJECTIONS['Low']['acquisition_cost_avoided_annual']/1e6:.0f} million in the low "
+        f"scenario, ${BIZ_PROJECTIONS['Mid']['acquisition_cost_avoided_annual']/1e6:.0f} million in the mid "
+        f"scenario, and ${BIZ_PROJECTIONS['High']['acquisition_cost_avoided_annual']/1e9:.2f} billion in the "
+        f"high scenario. Worth noting the ${_NB['cac_anchor']} figure was already trending upward before the "
+        "data cutoff (+31% from 2022 to 2024), so using it here likely understates today's real acquisition "
+        "cost rather than overstating it.")
+
+    measured_kpi(
+        "LTV:CAC Ratio",
+        f"{BIZ_PROJECTIONS['Low']['ltv_cac_ratio']:.2f}–{BIZ_PROJECTIONS['High']['ltv_cac_ratio']:.2f} : 1",
+        "benchmark ~3:1",
+        "**What it measures.** The last step in this same hypothetical chain — dividing the CLV figures above "
+        f"by the same ${_NB['cac_anchor']} acquisition-cost estimate — produces what's probably the single "
+        "most-referenced health check in subscription business models, LTV against CAC, with a commonly "
+        "cited healthy benchmark of roughly 3 to 1.",
+        f"**The numbers.** That gives {BIZ_PROJECTIONS['Low']['ltv_cac_ratio']:.2f} to 1 in the low scenario, "
+        f"{BIZ_PROJECTIONS['Mid']['ltv_cac_ratio']:.2f} to 1 in the mid, and "
+        f"{BIZ_PROJECTIONS['High']['ltv_cac_ratio']:.2f} to 1 in the high — every scenario landing below "
+        "breakeven. That needs to be read carefully, not at face value: Netflix is a highly profitable "
+        "company in reality, so a model implying it barely breaks even on new subscribers says more about "
+        "where this simplified model falls short than about Netflix's actual unit economics — most likely "
+        "from using whole-company operating margin as a stand-in for what a customer actually contributes, "
+        "and annualizing a US-specific monthly churn estimate as though it applied globally and indefinitely.")
+
+# ============================================================ SECTION 13 ==
+elif page.startswith("13."):
     section_header("KPI (archived)",
                    "Survey-response KPIs and the requested-marketing-metric tables, moved out of "
                    "9. KPI Scorecard so that section carries only the measured behavioural KPIs")
@@ -689,21 +852,22 @@ a single-session survey cannot provide. Applicable product/marketing indicators 
 | Feature adoption intent | {top_box}% top-box (n={tb_n}/{tb_d}) | stated intent; the *observed* take rate and adoption rate are measured in Section 9 |
 | Off-platform leakage (pre) | {leak}% (n={leak_n}/{leak_d}) | the addressable "value leak" the feature targets |
 | Retention intent | {stay}% (n={stay_n}/{stay_d}) | proxy for "retention lift" — stated, not observed |
-| Recommendation relevance | {rec}% "mostly wanted" (n={rec_n}/{rec_d}) | proxy for content-match quality |
+| Recommendation relevance | {rec}% "mostly wanted" (n={rec_n}/{rec_d}, gated item — see §6) | proxy for content-match quality |
 
 | Marketing metric requested | Status |
 |---|---|
 | Market share / value share / volume share | **Not measurable from current dataset** — requires competitor and category revenue/volume data |
-| CAC (customer acquisition cost) | **Not measurable** — requires marketing spend and acquisition counts |
+| CAC (customer acquisition cost) | **Not measurable** for this project's own program — requires this project's marketing spend and acquisition counts, which don't exist for a fake-door test. **12. Business / Financial Metrics** uses a different, external CAC figure (Netflix's own company-wide acquisition cost) for a related but distinct purpose — not this project's CAC. |
 | CRC (customer retention cost) | **Not measurable** — requires retention program spend |
 | EBITDA | **Not measurable** — requires full P&L data |
-| Actual retention / revenue impact | **Not measurable** — this is a single-session fake-door test with no time series or control cohort |
+| Retention rate | **Not measured** — this is a single-session fake-door test with no tracked cohort or time series. See **12. Business / Financial Metrics** for a hypothetical, if-implemented projection built from this project's own real leading indicators. |
+| CLV / LTV | **Not measured** — same reason as retention rate above, which CLV is derived from. See **12. Business / Financial Metrics** for the hypothetical treatment. |
 """.format(
         noticed=R["solution_validation"]["noticed_row"]["pct"], noticed_n=R["solution_validation"]["noticed_row"]["n"], noticed_d=R["solution_validation"]["noticed_row"]["d"],
         top_box=R["solution_validation"]["likelihood_use_next"]["pct_top_box_8plus"], tb_n=R["solution_validation"]["likelihood_use_next"]["n_top_box_8plus"], tb_d=R["solution_validation"]["likelihood_use_next"]["d"],
         leak=R["C4_leak"]["pct_off_platform"], leak_n=R["C4_leak"]["n_off_platform"], leak_d=R["C4_leak"]["d"],
         stay=R["solution_validation"]["stay_on_netflix"]["pct_stay"], stay_n=R["solution_validation"]["stay_on_netflix"]["n_stay"], stay_d=R["solution_validation"]["stay_on_netflix"]["d"],
-        rec=round(100*R["guardrail"]["distribution"].get("Mostly things I'd want",0)/R["guardrail"]["d"],1), rec_n=R["guardrail"]["distribution"].get("Mostly things I'd want",0), rec_d=R["guardrail"]["d"],
+        rec=round(100*R["guardrail"]["distribution"].get("Mostly things I'd want",0)/R["guardrail"]["valid_responses_n"],1), rec_n=R["guardrail"]["distribution"].get("Mostly things I'd want",0), rec_d=R["guardrail"]["valid_responses_n"],
     ))
 
     st.subheader("Behavioural KPIs still requiring instrumentation")
