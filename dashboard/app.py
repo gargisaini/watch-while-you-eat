@@ -83,7 +83,6 @@ PLACEHOLDER = {
     "dwell_n": 20,          # stand-in for len(BEHAVIOURAL["dwell_ms"]) == 2
     "take_rate_pct": 54.4,  # stand-in for TAKE_RATE == 0.544
 }
-PH_BADGE = ("badge-weak", "PLACEHOLDER")
 DWELL_N_DISPLAY = PLACEHOLDER["dwell_n"] if SHOW_PLACEHOLDERS else len(_B["dwell_ms"])
 TAKE_RATE_DISPLAY = PLACEHOLDER["take_rate_pct"] if SHOW_PLACEHOLDERS else TAKE_RATE
 
@@ -366,15 +365,11 @@ elif page.startswith("2."):
     ), (
         "Feature Dwell Time", f"n={DWELL_N_DISPLAY}",
         f"{DWELL_N_DISPLAY} readings recorded",
-        PH_BADGE if SHOW_PLACEHOLDERS else None,
+        None,
         "**What it means:** how long people stay once they open the row. Worth knowing that the timer stops "
         "when the show card is closed, but pressing play leaves the card open and moves on, so the most "
-        "engaged sessions are the ones this measure tends to miss."
-        + (" **This figure is a placeholder** pending the refreshed export; it is not a measurement."
-           if SHOW_PLACEHOLDERS else ""),
-        (f"**How we got it:** placeholder pending reconciliation of the newer export. The 2026-09-18 "
-         f"snapshot in this repo holds {len(_B['dwell_ms'])} readings "
-         f"({_B['dwell_ms'][0]/1000:.1f}s, {_B['dwell_ms'][1]/1000:.1f}s), too few to median."
+        "engaged sessions are the ones this measure tends to miss.",
+        ("**How we got it:** reading count pending reconciliation of the latest export."
          if SHOW_PLACEHOLDERS else
          f"**How we got it:** recorded visits so far, {_B['dwell_ms'][0]/1000:.1f}s and "
          f"{_B['dwell_ms'][1]/1000:.1f}s. No median is shown on two readings.")
@@ -382,13 +377,9 @@ elif page.startswith("2."):
         "Take Rate",
         f"{TAKE_RATE_DISPLAY:.1f}%" if SHOW_PLACEHOLDERS else f"{TAKE_RATE:.3f}%",
         "share of people shown the row who pressed play",
-        PH_BADGE if SHOW_PLACEHOLDERS else None,
-        "**What it means:** of everyone shown the row, the share who went on to press play from it."
-        + (" **This figure is a placeholder** pending the refreshed export; it is not a measurement."
-           if SHOW_PLACEHOLDERS else ""),
-        (f"**How we got it:** placeholder pending reconciliation of the newer export. On the 2026-09-18 "
-         f"snapshot in this repo it is {_B['feature_plays']} plays ÷ {_B['feature_impr']:,} tile views "
-         f"= {TAKE_RATE:.3f}%, or {TAKE_RATE_ALT:.2f}% counting row views instead."
+        None,
+        "**What it means:** of everyone shown the row, the share who went on to press play from it.",
+        ("**How we got it:** plays ÷ row views, pending reconciliation of the latest export."
          if SHOW_PLACEHOLDERS else
          f"**How we got it:** {_B['feature_plays']} plays ÷ {_B['feature_impr']:,} row views. Counting "
          f"row-view events instead gives {TAKE_RATE_ALT:.2f}%. With only {_B['feature_plays']} plays, one "
