@@ -316,14 +316,21 @@ elif page.startswith("2."):
         f"= {CTR_FEAT:.3f}%) ÷ a normal row's ({_B['generic_clicks']} ÷ {_B['generic_impr']:,} = {CTR_GEN:.3f}%). "
         f"Only {_B['feature_clicks']} clicks so far, so treat it as an early signal."
     ), (
-        "Content-to-Play", f"{C2P_FEAT_SESS:.1f}%", f"vs {C2P_ALL_SESS:.1f}% for the rest of the app",
+        # Headline is the per-open (event) figure rather than the per-session one.
+        # Both are computed above and both are assertion-pinned; this chooses which
+        # one leads. Per-open is the finer grain: a session that opened three shows
+        # and played once counts as three attempts here and as one success per
+        # session, so the session figure flatters the row.
+        "Content-to-Play", f"{C2P_FEAT_EVT:.1f}%", f"vs {C2P_ALL_EVT:.1f}% for the rest of the app",
         None,
-        "**What it means:** after opening a show from our row, people pressed play a bit less often than "
-        "elsewhere in the app. The row gets the click, but doesn't yet turn it into watching.",
-        f"**How we got it:** {_B['c2p_feat_sess_num']} of {_B['c2p_feat_sess_den']} sessions played after "
-        f"opening a show from the row, vs {_B['c2p_all_sess_num']} of {_B['c2p_all_sess_den']} app-wide "
-        f"(per open: {C2P_FEAT_EVT:.1f}% vs {C2P_ALL_EVT:.1f}%). {_B['top_title_opens']} of the "
-        f"{_B['c2p_feat_evt_den']} opens were one show (Breaking Bad), so one tile drives a lot of this."
+        "**What it means:** of every show opened from our row, this share ended in someone pressing play, "
+        "against the same figure for the rest of the app. The row earns the click; turning that into "
+        "watching is where it currently trails.",
+        f"**How we got it:** {_B['c2p_feat_evt_num']} plays from {_B['c2p_feat_evt_den']} shows opened via "
+        f"the row, vs {_B['c2p_all_evt_num']} from {_B['c2p_all_evt_den']} app-wide. Per session instead of "
+        f"per open it reads {C2P_FEAT_SESS:.1f}% vs {C2P_ALL_SESS:.1f}% — compare like with like. "
+        f"{_B['top_title_opens']} of the {_B['c2p_feat_evt_den']} opens were one show (Breaking Bad), so "
+        "one tile drives a lot of this."
     ), (
         "Feature Adoption", f"{ADOPTION:.1f}%",
         f"{_B['adoption_num']} of {_B['adoption_den']} sessions",
