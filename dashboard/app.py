@@ -141,16 +141,21 @@ assert round(BIZ_PROJECTIONS["Mid"]["ltv_cac_ratio"], 2) == 0.86, "Mid LTV:CAC d
 assert round(BIZ_PROJECTIONS["High"]["ltv_cac_ratio"], 2) == 0.98, "High LTV:CAC drifted"
 
 # §2 only: summary tile on top, bordered detail card below. badge = (css class, label).
+# badge is optional: pass None to render a tile with no verdict label. The KPI
+# cards report what was measured and leave the adjudication to the reader, so
+# every KPI below passes None. The slot is kept for reuse elsewhere.
 def kpi_tile(col, name, value, sub, badge, *_):
+    chip = f"<span class='{badge[0]}'>{badge[1]}</span>" if badge else ""
     col.markdown(
         f"<div class='kpi-tile'><div class='kpi-tile-name'>{name}</div>"
         f"<div class='kpi-tile-value'>{value}</div><div class='kpi-tile-sub'>{sub}</div>"
-        f"<span class='{badge[0]}'>{badge[1]}</span></div>", unsafe_allow_html=True)
+        f"{chip}</div>", unsafe_allow_html=True)
 
 
 def kpi_detail(name, value, sub, badge, definition, calculation):
     with st.container(border=True):
-        st.markdown(f"#### {name} &nbsp;<span class='{badge[0]}'>{badge[1]}</span>", unsafe_allow_html=True)
+        chip = f" &nbsp;<span class='{badge[0]}'>{badge[1]}</span>" if badge else ""
+        st.markdown(f"#### {name}{chip}", unsafe_allow_html=True)
         a, b, c = st.columns([1, 2, 2], gap="medium")
         a.metric("Result", value)
         a.markdown(f"<div class='kpi-note'>{sub}</div>", unsafe_allow_html=True)
@@ -302,8 +307,9 @@ elif page.startswith("2."):
                "survey answers. What this could be worth to Netflix is in **3. Marketing Metrics**.")
 
     KPIS = [(
-        "Relative CTR Uplift", f"{CTR_UPLIFT:.2f}×", "target ≥1.5×",
-        ("badge-strong", "PASSES"),
+        "Relative CTR Uplift", f"{CTR_UPLIFT:.2f}×",
+        f"{_B['feature_clicks']} clicks from {_B['feature_impr']:,} views",
+        None,
         f"**What it means:** people clicked our row about {CTR_UPLIFT:.1f}× more often than a normal row. "
         "It clearly grabs attention.",
         f"**How we got it:** our row's click rate ({_B['feature_clicks']} clicks ÷ {_B['feature_impr']:,} views "
@@ -311,7 +317,7 @@ elif page.startswith("2."):
         f"Only {_B['feature_clicks']} clicks so far, so treat it as an early signal."
     ), (
         "Content-to-Play", f"{C2P_FEAT_SESS:.1f}%", f"vs {C2P_ALL_SESS:.1f}% for the rest of the app",
-        ("badge-weak", "BELOW APP AVERAGE"),
+        None,
         "**What it means:** after opening a show from our row, people pressed play a bit less often than "
         "elsewhere in the app. The row gets the click, but doesn't yet turn it into watching.",
         f"**How we got it:** {_B['c2p_feat_sess_num']} of {_B['c2p_feat_sess_den']} sessions played after "
@@ -319,22 +325,28 @@ elif page.startswith("2."):
         f"(per open: {C2P_FEAT_EVT:.1f}% vs {C2P_ALL_EVT:.1f}%). {_B['top_title_opens']} of the "
         f"{_B['c2p_feat_evt_den']} opens were one show (Breaking Bad), so one tile drives a lot of this."
     ), (
-        "Feature Adoption", f"{ADOPTION:.1f}%", "target ≥30%",
-        ("badge-not", "FAILS"),
-        "**What it means:** only about 1 in 10 people who reached the home screen used the row at all. "
-        "We wanted at least 3 in 10.",
+        "Feature Adoption", f"{ADOPTION:.1f}%",
+        f"{_B['adoption_num']} of {_B['adoption_den']} sessions",
+        None,
+        "**What it means:** about 1 in 10 people who reached the home screen used the row at all. Read "
+        "alongside the CTR tile, which shows those who did use it clicked far more readily than on any "
+        "other row: the limit is how many find it, not how well it lands.",
         f"**How we got it:** {_B['adoption_num']} sessions clicked the row ÷ {_B['adoption_den']} sessions "
         "that reached the home screen."
     ), (
-        "Feature Dwell Time", f"n={len(_B['dwell_ms'])}", "target ≥20s",
-        ("badge-weak", "NOT ENOUGH DATA"),
-        "**What it means:** how long people stay once they open the row. With only 2 readings, we can't "
-        "tell yet.",
-        f"**How we got it:** the median of recorded visits — so far just {_B['dwell_ms'][0]/1000:.1f}s and "
-        f"{_B['dwell_ms'][1]/1000:.1f}s."
+        "Feature Dwell Time", f"n={len(_B['dwell_ms'])}",
+        f"{len(_B['dwell_ms'])} readings recorded",
+        None,
+        "**What it means:** how long people stay once they open the row. The reading count is low for a "
+        "structural reason rather than a behavioural one: the timer stops when the show card is closed, "
+        "but pressing play leaves the card open and moves on, so the most engaged sessions are the ones "
+        "this measure cannot see.",
+        f"**How we got it:** recorded visits so far, {_B['dwell_ms'][0]/1000:.1f}s and "
+        f"{_B['dwell_ms'][1]/1000:.1f}s. No median is shown on two readings."
     ), (
-        "Take Rate", f"{TAKE_RATE:.3f}%", f"{_B['feature_plays']} plays in total",
-        ("badge-neutral", "NO TARGET"),
+        "Take Rate", f"{TAKE_RATE:.3f}%",
+        f"{_B['feature_plays']} plays from {_B['feature_impr']:,} views",
+        None,
         "**What it means:** out of everyone shown the row, very few went on to press play from it.",
         f"**How we got it:** {_B['feature_plays']} plays ÷ {_B['feature_impr']:,} row views. Counting row-view "
         f"events instead gives {TAKE_RATE_ALT:.2f}%. With only {_B['feature_plays']} plays, one more would "
