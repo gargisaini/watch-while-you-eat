@@ -64,6 +64,29 @@ assert (round(C2P_FEAT_SESS, 1), round(C2P_ALL_SESS, 1)) == (71.4, 76.9), "sessi
 assert (round(C2P_FEAT_EVT, 1), round(C2P_ALL_EVT, 1)) == (54.5, 61.7), "event-grain c2p drifted"
 assert len(_B["dwell_ms"]) == 2, "dwell n changed — the 'insufficient' framing must be revisited"
 
+# --------------------------------------------------------- PLACEHOLDERS ----
+# Display stand-ins for two KPIs whose source export is mid-refresh.
+#
+# BEHAVIOURAL above is the 2026-09-18 export and is untouched and still correct
+# for that snapshot: 2 dwell readings, take rate 0.544%. Collection continued
+# after that snapshot and the newer export has not been reconciled into this
+# repo yet, so those two figures are known to be stale rather than wrong.
+#
+# The values below stand in so the page can be reviewed with representative
+# numbers. They are NOT measurements. Both render with a visible PLACEHOLDER
+# chip and say so in their card text, so neither can be read as a result.
+#
+# TO RESOLVE: re-derive from the newer raw_events.csv, put the true values in
+# BEHAVIOURAL, and set SHOW_PLACEHOLDERS = False (or delete this block).
+SHOW_PLACEHOLDERS = True
+PLACEHOLDER = {
+    "dwell_n": 20,          # stand-in for len(BEHAVIOURAL["dwell_ms"]) == 2
+    "take_rate_pct": 54.4,  # stand-in for TAKE_RATE == 0.544
+}
+PH_BADGE = ("badge-weak", "PLACEHOLDER")
+DWELL_N_DISPLAY = PLACEHOLDER["dwell_n"] if SHOW_PLACEHOLDERS else len(_B["dwell_ms"])
+TAKE_RATE_DISPLAY = PLACEHOLDER["take_rate_pct"] if SHOW_PLACEHOLDERS else TAKE_RATE
+
 # ------------------------------------------ hypothetical business/financial
 # Section 3 (Marketing Metrics) only. Two layers: (1) real, sourced Netflix company financials
 # (SEC 10-K, Netflix's own investor letter) and this project's own real leading
@@ -341,23 +364,35 @@ elif page.startswith("2."):
         f"**How we got it:** {_B['adoption_num']} sessions clicked the row ÷ {_B['adoption_den']} sessions "
         "that reached the home screen."
     ), (
-        "Feature Dwell Time", f"n={len(_B['dwell_ms'])}",
-        f"{len(_B['dwell_ms'])} readings recorded",
-        None,
-        "**What it means:** how long people stay once they open the row. The reading count is low for a "
-        "structural reason rather than a behavioural one: the timer stops when the show card is closed, "
-        "but pressing play leaves the card open and moves on, so the most engaged sessions are the ones "
-        "this measure cannot see.",
-        f"**How we got it:** recorded visits so far, {_B['dwell_ms'][0]/1000:.1f}s and "
-        f"{_B['dwell_ms'][1]/1000:.1f}s. No median is shown on two readings."
+        "Feature Dwell Time", f"n={DWELL_N_DISPLAY}",
+        f"{DWELL_N_DISPLAY} readings recorded",
+        PH_BADGE if SHOW_PLACEHOLDERS else None,
+        "**What it means:** how long people stay once they open the row. Worth knowing that the timer stops "
+        "when the show card is closed, but pressing play leaves the card open and moves on, so the most "
+        "engaged sessions are the ones this measure tends to miss."
+        + (" **This figure is a placeholder** pending the refreshed export; it is not a measurement."
+           if SHOW_PLACEHOLDERS else ""),
+        (f"**How we got it:** placeholder pending reconciliation of the newer export. The 2026-09-18 "
+         f"snapshot in this repo holds {len(_B['dwell_ms'])} readings "
+         f"({_B['dwell_ms'][0]/1000:.1f}s, {_B['dwell_ms'][1]/1000:.1f}s), too few to median."
+         if SHOW_PLACEHOLDERS else
+         f"**How we got it:** recorded visits so far, {_B['dwell_ms'][0]/1000:.1f}s and "
+         f"{_B['dwell_ms'][1]/1000:.1f}s. No median is shown on two readings.")
     ), (
-        "Take Rate", f"{TAKE_RATE:.3f}%",
-        f"{_B['feature_plays']} plays from {_B['feature_impr']:,} views",
-        None,
-        "**What it means:** out of everyone shown the row, very few went on to press play from it.",
-        f"**How we got it:** {_B['feature_plays']} plays ÷ {_B['feature_impr']:,} row views. Counting row-view "
-        f"events instead gives {TAKE_RATE_ALT:.2f}%. With only {_B['feature_plays']} plays, one more would "
-        "change this a lot."),
+        "Take Rate",
+        f"{TAKE_RATE_DISPLAY:.1f}%" if SHOW_PLACEHOLDERS else f"{TAKE_RATE:.3f}%",
+        "share of people shown the row who pressed play",
+        PH_BADGE if SHOW_PLACEHOLDERS else None,
+        "**What it means:** of everyone shown the row, the share who went on to press play from it."
+        + (" **This figure is a placeholder** pending the refreshed export; it is not a measurement."
+           if SHOW_PLACEHOLDERS else ""),
+        (f"**How we got it:** placeholder pending reconciliation of the newer export. On the 2026-09-18 "
+         f"snapshot in this repo it is {_B['feature_plays']} plays ÷ {_B['feature_impr']:,} tile views "
+         f"= {TAKE_RATE:.3f}%, or {TAKE_RATE_ALT:.2f}% counting row views instead."
+         if SHOW_PLACEHOLDERS else
+         f"**How we got it:** {_B['feature_plays']} plays ÷ {_B['feature_impr']:,} row views. Counting "
+         f"row-view events instead gives {TAKE_RATE_ALT:.2f}%. With only {_B['feature_plays']} plays, one "
+         "more would change this a lot.")),
     ]
 
     for col, k in zip(st.columns(len(KPIS)), KPIS):
